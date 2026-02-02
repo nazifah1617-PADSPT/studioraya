@@ -56,7 +56,6 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Kolom Kiri: Form & Info -->
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] space-y-3">
                     <h3 class="font-black text-amber-900 text-[10px] uppercase tracking-[0.2em]">Butiran Sesi</h3>
@@ -109,7 +108,6 @@
                 </div>
             </div>
 
-            <!-- Kolom Kanan: Slot Masa -->
             <div class="lg:col-span-7 space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 min-h-[600px] flex flex-col">
                     <div class="flex justify-between items-center mb-10">
@@ -224,7 +222,7 @@
     <!-- Modal Log Masuk Admin -->
     <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0" onclick="closeAdminLogin()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm relative z-10 p-10 text-center">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-sm relative z-10 p-10 text-center">
             <h3 class="text-xl font-black mb-6">Akses Pemilik</h3>
             <input type="password" id="admin-password" class="w-full border-2 border-slate-100 rounded-2xl p-4 text-center mb-6 font-bold outline-none" placeholder="Kata Laluan">
             <button onclick="verifyAdmin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all">MASUK</button>
@@ -448,15 +446,32 @@
         };
 
         window.confirmBooking = async (id) => {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-            await updateDoc(docRef, { verified: true });
-            showToast('Tempahan disahkan');
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
+                await updateDoc(docRef, { verified: true });
+                showToast('Tempahan disahkan');
+            } catch (err) {
+                console.error(err);
+                showToast('Gagal mengesahkan', '❌');
+            }
         };
 
         window.removeBooking = async (id) => {
-            if(confirm('Hapus tempahan ini?')) {
-                await deleteDoc(docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id));
-                showToast('Tempahan dipadam');
+            // Kita gunakan prompt sederhana atau langsung hapus karena confirm() sering bermasalah di iframe
+            const logicHapus = async () => {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
+                    await deleteDoc(docRef);
+                    showToast('Tempahan dipadam', '🗑️');
+                } catch (err) {
+                    console.error("Delete Error:", err);
+                    showToast('Ralat memadam data', '❌');
+                }
+            };
+            
+            // Gunakan konfirmasi browser standar, jika gagal di iframe, kita tambahkan penanganan
+            if (window.confirm('Adakah anda pasti ingin memadam tempahan ini?')) {
+                await logicHapus();
             }
         };
 
@@ -472,12 +487,18 @@
             document.getElementById('admin-view')?.classList.toggle('hidden', v !== 'admin');
             if(v === 'admin') renderAdminDashboard();
         };
-        window.handleAdminAccess = () => document.getElementById('login-modal')?.classList.remove('hidden');
+        window.handleAdminAccess = () => {
+            if (!document.getElementById('admin-view').classList.contains('hidden')) {
+                switchView('client');
+            } else {
+                document.getElementById('login-modal')?.classList.remove('hidden');
+            }
+        };
         window.closeAdminLogin = () => document.getElementById('login-modal')?.classList.add('hidden');
         window.verifyAdmin = () => {
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin(); switchView('admin');
-            } else showToast('Salah!', '❌');
+            } else showToast('Kata laluan salah!', '❌');
         };
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
