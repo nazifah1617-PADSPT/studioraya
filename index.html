@@ -2,184 +2,178 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Studio Raya 2026 - Sistem Tempahan Rasmi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            letter-spacing: -0.01em; 
+            -webkit-tap-highlight-color: transparent;
+        }
         .slot-booked { background-color: #fee2e2; border-color: #fecaca; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
         .slot-available { cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .slot-available:hover { transform: translateY(-3px); border-color: #92400e; background-color: #fffbeb; box-shadow: 0 10px 15px -3px rgba(146, 64, 14, 0.1); }
+        .slot-available:active { transform: scale(0.95); }
+        
+        @media (min-width: 1024px) {
+            .slot-available:hover { transform: translateY(-3px); border-color: #92400e; background-color: #fffbeb; box-shadow: 0 10px 15px -3px rgba(146, 64, 14, 0.1); }
+        }
+
         .modal-overlay { background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); }
         .qr-selected { border-color: #92400e; background-color: #fffbeb; ring: 2px; ring-color: #92400e; }
         
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         
         .animate-subtle-fade { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 640px) {
+            .container-padding { padding-left: 1rem; padding-right: 1rem; }
+            h1 { font-size: 2.25rem !important; }
+        }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900 overflow-x-hidden">
 
     <!-- Notifikasi Toast -->
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[110] transform transition-all duration-300 translate-y-[-150%] opacity-0">
-        <div class="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[120] w-[90%] max-w-sm transform transition-all duration-300 translate-y-[-150%] opacity-0">
+        <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
             <span id="toast-icon" class="text-xl"></span>
-            <span id="toast-msg" class="text-sm font-bold tracking-tight"></span>
+            <span id="toast-msg" class="text-xs font-bold tracking-tight"></span>
         </div>
     </div>
 
     <!-- Navigasi -->
     <nav class="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center space-x-4 cursor-pointer group" onclick="location.reload()">
-                    <div class="w-12 h-12 bg-amber-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-xl shadow-amber-900/20 group-hover:scale-105 transition-transform">S</div>
+            <div class="flex justify-between h-16 sm:h-20 items-center">
+                <div class="flex items-center space-x-2 sm:space-x-4 cursor-pointer group" onclick="location.reload()">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-800 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold shadow-xl shadow-amber-900/20">S</div>
                     <div>
-                        <span class="text-xl font-extrabold text-slate-900 block leading-none tracking-tighter">Studio Raya <span class="text-amber-800">2026</span></span>
-                        <span id="connection-status" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Sistem Sedang Dimuatkan...</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-slate-900 block leading-none tracking-tighter">Studio Raya <span class="text-amber-800">2026</span></span>
+                        <span id="connection-status" class="hidden sm:block text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Sistem Sedia</span>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="switchView('client')" id="nav-client" class="px-6 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg shadow-amber-900/10 hover:bg-amber-900 transition-all">Tempahan</button>
-                    <button onclick="handleAdminAccess()" id="nav-admin" class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all">Papan Pemilik</button>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <button onclick="switchView('client')" id="nav-client" class="px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-800 text-white shadow-lg shadow-amber-900/10">Tempahan</button>
+                    <button onclick="handleAdminAccess()" id="nav-admin" class="px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all">Pemilik</button>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Paparan Pelanggan -->
-    <main id="client-view" class="max-w-6xl mx-auto px-4 py-12 animate-subtle-fade">
-        <header class="max-w-3xl mx-auto text-center mb-16 space-y-4">
-            <span class="px-4 py-1.5 bg-amber-100 text-amber-800 text-[10px] font-black rounded-full uppercase tracking-[0.2em]">Koleksi Eksklusif Lebaran</span>
-            <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tighter leading-tight">Abadikan Memori <br><span class="text-amber-800 italic">Terindah Anda</span></h1>
-            <p class="text-slate-500 text-lg max-w-xl mx-auto">Sila pilih pakej dan slot masa di bawah. Tempahan disahkan secara automatik sebaik sahaja resit dimuat naik.</p>
+    <main id="client-view" class="max-w-6xl mx-auto px-4 py-8 sm:py-12 animate-subtle-fade">
+        <header class="max-w-3xl mx-auto text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4">
+            <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[9px] sm:text-[10px] font-black rounded-full uppercase tracking-[0.2em]">Koleksi Eksklusif Lebaran</span>
+            <h1 class="text-3xl sm:text-6xl font-extrabold text-slate-900 tracking-tighter leading-tight">Abadikan Memori <br><span class="text-amber-800 italic text-2xl sm:text-5xl">Terindah Anda</span></h1>
+            <p class="text-slate-500 text-sm sm:text-lg max-w-xl mx-auto px-4">Sila pilih pakej dan slot masa di bawah. Maklumat disimpan secara real-time.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
             <!-- Bahagian Kiri: Borang -->
             <div class="lg:col-span-5 space-y-6">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200/60 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
-                    <h2 class="text-xl font-bold mb-8 text-slate-800 flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-black">01</span>
+                <div class="bg-white p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-200/60">
+                    <h2 class="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-slate-800 flex items-center gap-3">
+                        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs sm:text-sm font-black">01</span>
                         Maklumat Peribadi
                     </h2>
                     
-                    <div class="space-y-6 relative z-10">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Penuh</label>
-                            <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold" placeholder="Cth: Muhammad Izzat">
+                    <div class="space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Penuh</label>
+                            <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold text-sm" placeholder="Cth: Muhammad Izzat">
                         </div>
                         
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">No. WhatsApp</label>
-                            <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold" placeholder="Cth: 0112345678">
+                        <div class="space-y-1.5">
+                            <label class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">No. WhatsApp</label>
+                            <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold text-sm" placeholder="Cth: 0112345678">
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilihan Pakej</label>
-                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none focus:border-amber-500">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilihan Pakej</label>
+                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold outline-none text-sm">
                                     <option value="89">Sebelum Puasa (RM89)</option>
                                     <option value="99">Bulan Puasa (RM99)</option>
                                     <option value="150">Raya Pertama (RM150)</option>
                                 </select>
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Pax</label>
-                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none focus:border-amber-500">
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Pax</label>
+                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold outline-none text-sm">
                             </div>
                         </div>
 
                         <div class="pt-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-4 block ml-1">Mod Pembayaran</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all">BAYAR PENUH</button>
-                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all">DEPOSIT (RM39)</button>
+                            <label class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase mb-3 block ml-1 tracking-widest">Mod Pembayaran</label>
+                            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all uppercase tracking-wider">Bayar Penuh</button>
+                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-slate-100 text-slate-400 transition-all uppercase tracking-wider">Deposit (RM39)</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Kad Harga -->
-                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
+                <div class="bg-slate-900 p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
                     <div class="relative z-10">
-                        <p class="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-2">Jumlah Perlu Bayar Sekarang</p>
-                        <h3 id="ui-pay-now" class="text-5xl font-black tracking-tighter">RM 89.00</h3>
-                        <div id="ui-balance-box" class="hidden mt-6 pt-6 border-t border-white/10 animate-subtle-fade">
-                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Baki perlu dijelaskan di studio:</p>
-                            <p id="ui-balance-amount" class="text-2xl font-bold text-amber-500 mt-1">RM 0.00</p>
+                        <p class="text-[9px] sm:text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-2">Perlu Bayar Sekarang</p>
+                        <h3 id="ui-pay-now" class="text-3xl sm:text-5xl font-black tracking-tighter">RM 89.00</h3>
+                        <div id="ui-balance-box" class="hidden mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10 animate-subtle-fade">
+                            <p class="text-[9px] sm:text-[10px] text-slate-400 font-black uppercase tracking-widest">Baki dijelaskan di studio:</p>
+                            <p id="ui-balance-amount" class="text-lg sm:text-2xl font-bold text-amber-500">RM 0.00</p>
                         </div>
                     </div>
-                    <!-- Kesan Visual Hiasan -->
-                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-800/20 rounded-full blur-3xl group-hover:bg-amber-800/40 transition-all duration-700"></div>
-                </div>
-                
-                <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] space-y-4">
-                    <h3 class="font-black text-amber-900 text-[10px] uppercase tracking-[0.2em]">Terma & Syarat Sesi</h3>
-                    <ul class="text-[11px] text-amber-800 space-y-2.5 font-bold leading-relaxed">
-                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Sesi 20 minit (5 min persiapan, 15 min rakaman)</li>
-                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Shoot & Edit (Unlimited Photos)</li>
-                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Penghantaran Softcopy via Google Drive (48 jam)</li>
-                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Tambahan Pax ke-7 hingga 10: RM5/pax</li>
-                    </ul>
+                    <div class="absolute -right-8 -bottom-8 w-24 h-24 sm:w-32 sm:h-32 bg-amber-800/20 rounded-full blur-3xl transition-all duration-700"></div>
                 </div>
             </div>
 
             <!-- Bahagian Kanan: Slot Masa -->
-            <div class="lg:col-span-7 space-y-8">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200/60 min-h-[600px] flex flex-col">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12">
-                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-black">02</span>
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-200/60 min-h-[500px] flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-12">
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs sm:text-sm font-black">02</span>
                             Pilih Jadual Masa
                         </h2>
-                        <div class="relative w-full sm:w-auto">
-                            <input type="date" id="booking-date" onchange="renderTimeSlots()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black text-sm outline-none focus:border-amber-500 cursor-pointer">
-                        </div>
+                        <input type="date" id="booking-date" onchange="renderTimeSlots()" class="w-full sm:w-auto bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-black text-xs sm:text-sm outline-none focus:border-amber-500">
                     </div>
                     
-                    <div id="slots-container" class="space-y-12">
+                    <div id="slots-container" class="space-y-8 sm:space-y-12">
                         <!-- Sesi Siang -->
                         <div>
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center shadow-sm border border-orange-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-50 text-orange-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-orange-100">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
                                 </div>
-                                <div>
-                                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Siang</h3>
-                                    <p class="text-xs font-bold text-slate-600">9.00 AM - 7.00 PM</p>
-                                </div>
+                                <h3 class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Siang (9AM - 7PM)</h3>
                             </div>
-                            <div id="day-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                            <div id="day-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3"></div>
                         </div>
 
                         <!-- Sesi Malam -->
                         <div>
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm border border-indigo-100">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-indigo-100">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                                 </div>
-                                <div>
-                                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Malam</h3>
-                                    <p class="text-xs font-bold text-slate-600">8.30 PM - 11.00 PM</p>
-                                </div>
+                                <h3 class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Malam (8.30PM - 11PM)</h3>
                             </div>
-                            <div id="night-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                            <div id="night-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3"></div>
                         </div>
                     </div>
                     
-                    <div id="selection-summary" class="hidden mt-auto pt-10">
-                        <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                    <div id="selection-summary" class="hidden mt-auto pt-8">
+                        <div class="p-6 sm:p-8 bg-amber-50 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                             <div class="text-center sm:text-left">
-                                <p class="text-[10px] text-amber-700 font-black uppercase tracking-[0.2em] mb-1">Masa Dipilih</p>
-                                <p class="text-4xl font-black text-amber-900 tracking-tighter" id="ui-selected-slot">--:--</p>
+                                <p class="text-[9px] sm:text-[10px] text-amber-700 font-black uppercase tracking-[0.2em] mb-1">Masa Dipilih</p>
+                                <p class="text-2xl sm:text-4xl font-black text-amber-900 tracking-tighter" id="ui-selected-slot">--:--</p>
                             </div>
-                            <button onclick="openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-12 py-5 rounded-2xl font-black shadow-xl shadow-amber-900/20 hover:bg-amber-900 transition-all active:scale-95 text-sm uppercase tracking-wider">Teruskan Bayaran</button>
+                            <button onclick="openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-8 py-4 sm:px-12 sm:py-5 rounded-xl sm:rounded-2xl font-black shadow-xl shadow-amber-900/20 hover:bg-amber-900 transition-all active:scale-95 text-xs sm:text-sm uppercase tracking-wider">Sahkan Bayaran</button>
                         </div>
                     </div>
                 </div>
@@ -188,164 +182,161 @@
     </main>
 
     <!-- Dashboard Pemilik -->
-    <main id="admin-view" class="max-w-7xl mx-auto px-4 py-12 hidden animate-subtle-fade">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-8">
+    <main id="admin-view" class="max-w-7xl mx-auto px-4 py-8 sm:py-12 hidden animate-subtle-fade">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 sm:mb-12 gap-6 sm:gap-8">
             <div class="space-y-2">
-                <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-full uppercase tracking-widest">Pengurusan Studio</span>
-                <h1 class="text-4xl font-black text-slate-900 tracking-tighter">Papan Kawalan Pemilik</h1>
-                <p class="text-slate-500 font-medium">Urus kutipan tunai dan pantau jadual tempahan pelanggan.</p>
+                <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[9px] sm:text-[10px] font-black rounded-full uppercase tracking-widest">Pengurusan Studio</span>
+                <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tighter">Papan Kawalan Pemilik</h1>
             </div>
-            <div class="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Tapis Tarikh</span>
-                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="border-0 rounded-xl p-3 font-black bg-slate-50 outline-none text-sm focus:ring-2 focus:ring-amber-500">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Total Tempahan</p>
-                <h3 id="stat-total" class="text-3xl font-black text-slate-900">0</h3>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Kutipan Online</p>
-                <h3 id="stat-online" class="text-3xl font-black text-emerald-600">RM 0.00</h3>
-            </div>
-            <div class="bg-amber-50 p-8 rounded-[2.5rem] border border-amber-100 shadow-sm">
-                <p class="text-[10px] font-black text-amber-600 uppercase mb-3 tracking-widest">Baki Belum Dikutip</p>
-                <h3 id="stat-balance-pending" class="text-3xl font-black text-amber-800">RM 0.00</h3>
-            </div>
-            <div class="bg-emerald-50 p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm">
-                <p class="text-[10px] font-black text-emerald-600 uppercase mb-3 tracking-widest">Baki Sudah Dikutip</p>
-                <h3 id="stat-balance-collected" class="text-3xl font-black text-emerald-700">RM 0.00</h3>
+            <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto">
+                <span class="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 whitespace-nowrap">Tapis Tarikh</span>
+                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="w-full sm:w-auto border-0 rounded-lg p-2 font-black bg-slate-50 outline-none text-xs focus:ring-2 focus:ring-amber-500">
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
+            <div class="bg-white p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Pemesanan</p>
+                <h3 id="stat-total" class="text-xl sm:text-3xl font-black text-slate-900">0</h3>
+            </div>
+            <div class="bg-white p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Online</p>
+                <h3 id="stat-online" class="text-xl sm:text-3xl font-black text-emerald-600">RM 0</h3>
+            </div>
+            <div class="bg-amber-50 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-amber-100 shadow-sm">
+                <p class="text-[8px] sm:text-[10px] font-black text-amber-600 uppercase mb-2 tracking-widest">Target Tunai</p>
+                <h3 id="stat-balance-pending" class="text-xl sm:text-3xl font-black text-amber-800">RM 0</h3>
+            </div>
+            <div class="bg-emerald-50 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-emerald-100 shadow-sm">
+                <p class="text-[8px] sm:text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">Baki Dikutip</p>
+                <h3 id="stat-balance-collected" class="text-xl sm:text-3xl font-black text-emerald-700">RM 0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b border-slate-100">
+                <table class="w-full text-left min-w-[600px]">
+                    <thead class="bg-slate-50 text-[9px] sm:text-[10px] uppercase font-black text-slate-400 border-b border-slate-100">
                         <tr>
-                            <th class="px-8 py-6">Masa</th>
-                            <th class="px-8 py-6">Pelanggan</th>
-                            <th class="px-8 py-6 text-center">Status</th>
-                            <th class="px-8 py-6 text-center text-emerald-600">Online (Deposit)</th>
-                            <th class="px-8 py-6 text-center text-amber-700">Tunai (Baki)</th>
-                            <th class="px-8 py-6 text-right">Tindakan</th>
+                            <th class="px-6 py-4 sm:px-8 sm:py-6">Masa</th>
+                            <th class="px-6 py-4 sm:px-8 sm:py-6">Pelanggan</th>
+                            <th class="px-6 py-4 sm:px-8 sm:py-6 text-center">Dibayar</th>
+                            <th class="px-6 py-4 sm:px-8 sm:py-6 text-center text-amber-700">Tunai</th>
+                            <th class="px-6 py-4 sm:px-8 sm:py-6 text-right">Tindakan</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-table-body" class="divide-y divide-slate-50 font-medium"></tbody>
+                    <tbody id="admin-table-body" class="divide-y divide-slate-50 text-xs sm:text-sm font-medium"></tbody>
                 </table>
             </div>
         </div>
     </main>
 
     <!-- Modal Pembayaran QR -->
-    <div id="payment-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div id="payment-modal" class="fixed inset-0 z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="modal-overlay absolute inset-0" onclick="closePaymentModal()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 p-8 sm:p-10 space-y-8 max-h-[90vh] overflow-y-auto animate-subtle-fade">
+        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 p-6 sm:p-10 space-y-6 sm:space-y-8 max-h-[95vh] overflow-y-auto animate-subtle-fade">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black tracking-tight text-slate-900">Pembayaran Deposit</h3>
+                <h3 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Pembayaran Deposit</h3>
                 <button onclick="closePaymentModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
                     <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div class="text-center py-8 bg-slate-50 rounded-[2rem] border border-slate-200/60">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Amaun Perlu Dibayar</p>
-                <p id="ui-modal-pay" class="text-5xl font-black text-amber-800 tracking-tighter">RM 0.00</p>
+            <div class="text-center py-6 sm:py-8 bg-slate-50 rounded-2xl sm:rounded-[2rem] border border-slate-200/60">
+                <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 sm:mb-2">Amaun Perlu Dibayar</p>
+                <p id="ui-modal-pay" class="text-3xl sm:text-5xl font-black text-amber-800 tracking-tighter">RM 0.00</p>
             </div>
 
-            <div class="space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="selectQR('maybank')" id="qr-btn-maybank" class="flex flex-col items-center gap-3 p-5 border-2 rounded-2xl transition-all qr-selected group">
-                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-8 group-hover:scale-110 transition-transform" alt="Maybank">
-                        <span class="text-[10px] font-black uppercase tracking-widest">Maybank MAE</span>
+            <div class="space-y-4 sm:space-y-6">
+                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                    <button onclick="selectQR('maybank')" id="qr-btn-maybank" class="flex flex-col items-center gap-2 sm:gap-3 p-4 sm:p-5 border-2 rounded-2xl transition-all qr-selected group">
+                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-6 sm:h-8" alt="Maybank">
+                        <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Maybank MAE</span>
                     </button>
-                    <button onclick="selectQR('tngo')" id="qr-btn-tngo" class="flex flex-col items-center gap-3 p-5 border-2 rounded-2xl border-slate-100 transition-all opacity-50 group">
-                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-8 group-hover:scale-110 transition-transform" alt="TNG">
-                        <span class="text-[10px] font-black uppercase tracking-widest">Touch 'n Go</span>
+                    <button onclick="selectQR('tngo')" id="qr-btn-tngo" class="flex flex-col items-center gap-2 sm:gap-3 p-4 sm:p-5 border-2 rounded-2xl border-slate-100 transition-all opacity-50 group">
+                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-6 sm:h-8" alt="TNG">
+                        <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">Touch 'n Go</span>
                     </button>
                 </div>
 
-                <div class="bg-white p-8 rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner group">
-                    <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-64 h-64 object-contain mb-6 rounded-xl group-hover:scale-105 transition-transform duration-500" alt="Kod QR">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center">Sila imbas kod di atas & muat naik resit</p>
+                <div class="bg-white p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner group">
+                    <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-48 h-48 sm:w-64 sm:h-64 object-contain mb-4 sm:mb-6 rounded-xl transition-transform duration-500" alt="Kod QR">
+                    <p class="text-[8px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center">Scan QR & Muat Naik Resit</p>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Muat Naik Resit (Tangkapan Skrin)</label>
-                <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-3 rounded-2xl border-2 border-dashed border-slate-200">
+                <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Muat Naik Resit (Screenshot)</label>
+                <input type="file" id="receipt-input" accept="image/*" class="w-full text-[10px] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[9px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-2 sm:p-3 rounded-xl border-2 border-dashed border-slate-200">
             </div>
 
-            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-2xl shadow-amber-900/30 hover:bg-amber-900 transition-all active:scale-95 uppercase tracking-widest text-sm">Hantar Tempahan</button>
+            <button onclick="submitBooking()" id="btn-submit" class="w-full py-4 sm:py-5 bg-amber-800 text-white rounded-xl sm:rounded-[1.5rem] font-black shadow-2xl shadow-amber-900/30 hover:bg-amber-900 transition-all active:scale-95 uppercase tracking-widest text-xs sm:text-sm">Hantar Tempahan</button>
         </div>
     </div>
 
-    <!-- Modal Kejayaan & WhatsApp -->
-    <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- Modal Success & WhatsApp Sender -->
+    <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="modal-overlay absolute inset-0"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-[110] p-8 sm:p-10 space-y-8 animate-subtle-fade">
+        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-110 p-6 sm:p-10 space-y-6 sm:space-y-8 animate-subtle-fade">
             <div class="text-center">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h2 class="text-3xl font-black text-slate-900 tracking-tighter">Tempahan Selesai!</h2>
-                <p class="text-slate-500 font-medium mt-2">Terima kasih. Sila hantar butiran ini ke WhatsApp studio untuk semakan akhir.</p>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter">Tempahan Selesai!</h2>
+                <p class="text-slate-500 font-medium text-sm mt-1">Sila hantar maklumat di bawah ke WhatsApp studio.</p>
             </div>
 
-            <div class="bg-white border-2 border-slate-100 rounded-[2rem] p-8 space-y-8 shadow-sm">
-                <div class="flex justify-between items-start border-b border-slate-100 pb-6">
+            <div class="bg-white border-2 border-slate-100 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 space-y-6 sm:space-y-8 shadow-sm overflow-hidden">
+                <div class="flex justify-between items-start border-b border-slate-100 pb-4 sm:pb-6">
                     <div>
-                        <h3 class="text-xl font-black text-amber-800 uppercase tracking-tighter leading-none">Slip Rasmi Sesi</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
+                        <h3 class="text-lg sm:text-xl font-black text-amber-800 uppercase tracking-tighter leading-none">Studio Raya 2026</h3>
+                        <p class="text-[8px] sm:text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID Rujukan</p>
-                        <p id="rcpt-ref" class="text-sm font-black text-slate-900">#RAYA-0000</p>
+                        <p id="rcpt-ref" class="text-xs sm:text-sm font-black text-slate-900">#RAYA-0000</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <div class="space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+                    <div class="space-y-4">
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pelanggan</p>
-                            <p id="rcpt-name" class="font-bold text-slate-800 text-lg leading-tight">-</p>
-                            <p id="rcpt-phone" class="text-xs text-slate-500 font-semibold">-</p>
+                            <p class="text-[8px] sm:text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pelanggan</p>
+                            <p id="rcpt-name" class="font-bold text-slate-800 text-sm sm:text-lg leading-tight">-</p>
+                            <p id="rcpt-phone" class="text-[10px] sm:text-xs text-slate-500 font-semibold">-</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pakej & Kapasiti</p>
-                            <p id="rcpt-pax" class="font-bold text-slate-800">-</p>
+                            <p class="text-[8px] sm:text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pakej</p>
+                            <p id="rcpt-pax" class="font-bold text-slate-800 text-xs sm:text-sm">-</p>
                         </div>
                     </div>
-                    <div class="space-y-5">
+                    <div class="space-y-4">
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Jadual Sesi</p>
-                            <p id="rcpt-date" class="font-bold text-slate-800">-</p>
-                            <p id="rcpt-slot" class="text-xl font-black text-amber-800 uppercase mt-1">-</p>
+                            <p class="text-[8px] sm:text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Jadual</p>
+                            <p id="rcpt-date" class="font-bold text-slate-800 text-xs sm:text-sm">-</p>
+                            <p id="rcpt-slot" class="text-lg sm:text-xl font-black text-amber-800 uppercase mt-1">-</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 rounded-2xl p-6 space-y-4">
-                    <div class="flex justify-between text-xs font-bold">
-                        <span class="text-slate-400 uppercase tracking-widest">Deposit Dibayar</span>
+                <div class="bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4">
+                    <div class="flex justify-between text-[10px] sm:text-xs font-bold">
+                        <span class="text-slate-400 uppercase">Deposit</span>
                         <span id="rcpt-amount" class="text-slate-900 font-black">RM 0.00</span>
                     </div>
-                    <div class="flex justify-between text-xs border-t border-slate-200 pt-4">
-                        <span class="text-amber-800 font-black uppercase tracking-widest">Baki Dibayar Di Studio</span>
-                        <span id="rcpt-balance" class="text-amber-800 font-black text-2xl tracking-tighter">RM 0.00</span>
+                    <div class="flex justify-between text-[10px] sm:text-xs border-t border-slate-200 pt-3 sm:pt-4">
+                        <span class="text-amber-800 font-black uppercase tracking-widest text-[9px] sm:text-xs">Baki Di Studio</span>
+                        <span id="rcpt-balance" class="text-amber-800 font-black text-xl sm:text-2xl tracking-tighter">RM 0.00</span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-4">
-                <button onclick="sendToWhatsApp()" class="bg-[#25D366] text-white py-5 rounded-2xl font-black shadow-xl shadow-green-900/10 flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95 text-sm uppercase tracking-widest">
+            <div class="flex flex-col gap-3">
+                <button onclick="sendToWhatsApp()" class="bg-[#25D366] text-white py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black shadow-xl flex items-center justify-center gap-3 hover:opacity-90 transition-all text-xs sm:text-sm uppercase tracking-widest">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.903-6.16 2.544-1.64 1.641-2.543 3.841-2.543 6.162 0 1.611.433 3.191 1.245 4.578L3.394 24l4.695-1.231c1.332.727 2.83 1.111 4.35 1.111h.001c4.809 0 8.711-3.903 8.711-8.711 0-2.321-.904-4.521-2.545-6.162-1.641-1.641-3.841-2.544-6.162-2.544zM7.191 10.119c.148-.329.493-.541.83-.541.148 0 .294.032.423.088.13.056.242.144.331.258.113.144.186.314.214.492.027.177.011.359-.047.527l-.464 1.026c.307.399.664.756 1.063 1.063l1.026-.464c.168-.058.35-.074.527-.047.178.028.348.101.492.214.114.089.202.201.258.331.056.129.088.275.088.423 0 .337-.212.682-.541.83l-1.026.464c-.399-.307-.756-.664-1.063-1.063l.464-1.026c.058-.168.074-.35.047-.527a.64.64 0 00-.214-.492.65.65 0 00-.331-.258z"/></svg>
-                    Hantar Ke WhatsApp Studio
+                    WhatsApp Maklumat Tempahan
                 </button>
-                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all text-[10px] uppercase tracking-[0.3em]">
-                    Tutup & Tempah Baru
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-xl sm:rounded-2xl font-black hover:bg-slate-200 transition-all text-[9px] uppercase tracking-[0.3em]">
+                    Selesai & Tutup
                 </button>
             </div>
         </div>
@@ -354,14 +345,14 @@
     <!-- Modal Login Pemilik -->
     <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 animate-subtle-fade">
         <div class="modal-overlay absolute inset-0" onclick="closeAdminLogin()"></div>
-        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm relative z-10 p-12 text-center">
-            <div class="w-20 h-20 bg-amber-100 text-amber-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm relative z-10 p-10 text-center border border-slate-200">
+            <div class="w-16 h-16 bg-amber-100 text-amber-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
-            <h3 class="text-2xl font-black mb-2 text-slate-900 tracking-tight">Log Masuk Pemilik</h3>
-            <p class="text-slate-400 text-sm mb-8 font-semibold">Sila masukkan kata laluan keselamatan.</p>
+            <h3 class="text-xl font-black mb-1 text-slate-900 tracking-tight">Log Masuk Pemilik</h3>
+            <p class="text-slate-400 text-xs mb-8 font-semibold uppercase tracking-widest">Sila masukkan kata laluan</p>
             <input type="password" id="admin-password" class="w-full border-2 border-slate-100 rounded-2xl p-4 text-center mb-6 font-black outline-none focus:border-amber-500 transition-all bg-slate-50" placeholder="••••••••">
-            <button onclick="verifyAdmin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-black transition-all shadow-xl uppercase tracking-widest text-sm">Masuk Dashboard</button>
+            <button onclick="verifyAdmin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-black transition-all shadow-xl uppercase tracking-widest text-xs">Akses Dashboard</button>
         </div>
     </div>
 
@@ -474,8 +465,15 @@
 
         window.setPaymentType = (type) => {
             payType = type;
-            document.getElementById('pay-type-full').className = type === 'full' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
-            document.getElementById('pay-type-booking').className = type === 'booking' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
+            const btnFull = document.getElementById('pay-type-full');
+            const btnBooking = document.getElementById('pay-type-booking');
+            if (type === 'full') {
+                btnFull.className = 'p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all uppercase tracking-wider shadow-sm';
+                btnBooking.className = 'p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-slate-100 text-slate-400 transition-all uppercase tracking-wider';
+            } else {
+                btnBooking.className = 'p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all uppercase tracking-wider shadow-sm';
+                btnFull.className = 'p-3 sm:p-4 text-[9px] sm:text-[10px] font-black border-2 rounded-xl sm:rounded-2xl border-slate-100 text-slate-400 transition-all uppercase tracking-wider';
+            }
             updateCalculations();
         };
 
@@ -487,13 +485,12 @@
             
             dayGrid.innerHTML = '';
             nightGrid.innerHTML = '';
-            
             const booked = bookings.filter(b => b.date === date && b.verified).map(b => b.slot);
             
             const createSlot = (time24, container) => {
                 const isBooked = booked.includes(time24);
                 const el = document.createElement('div');
-                el.className = `p-4 text-center border-2 rounded-2xl text-xs font-black tracking-tight transition-all ${isBooked ? 'slot-booked' : 'slot-available bg-white border-slate-100'}`;
+                el.className = `p-3 sm:p-4 text-center border-2 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black tracking-tight transition-all ${isBooked ? 'slot-booked' : 'slot-available bg-white border-slate-100'}`;
                 el.innerText = format12h(time24);
                 
                 if(!isBooked) el.onclick = () => {
@@ -502,11 +499,14 @@
                     selectedSlot = time24;
                     document.getElementById('ui-selected-slot').innerText = format12h(time24);
                     document.getElementById('selection-summary').classList.remove('hidden');
+                    // Scroll to summary on mobile
+                    if (window.innerWidth < 640) {
+                        document.getElementById('selection-summary').scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }
                 };
                 container.appendChild(el);
             };
 
-            // Sesi Siang: 9.00 AM - 7.00 PM
             for(let h=9; h<19; h++) {
                 [0, 30].forEach(m => {
                     const time24 = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
@@ -514,7 +514,6 @@
                 });
             }
 
-            // Sesi Malam: 8.30 PM - 11.00 PM
             const nightTimes = ['20:30', '21:00', '21:30', '22:00', '22:30'];
             nightTimes.forEach(time24 => {
                 createSlot(time24, nightGrid);
@@ -597,7 +596,7 @@
             const dateStr = new Date(b.date).toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             const balance = (b.totalPrice - b.amount).toFixed(2);
             
-            const message = `📸 *PENGESAHAN TEMPAHAN STUDIO RAYA*%0A%0AId Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Resit:* Bukti pembayaran telah dimuat naik ke dalam sistem. Sila semak. Terima kasih!`;
+            const message = `📸 *PENGESAHAN TEMPAHAN STUDIO RAYA*%0A%0AId Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Nota:* Bukti pembayaran telah dimuat naik. Sila semak. Terima kasih!`;
 
             window.open(`https://wa.me/601151929350?text=${message}`, '_blank');
         };
@@ -610,9 +609,7 @@
             const filtered = bookings.filter(b => b.date === fDate).sort((a,b) => a.slot.localeCompare(b.slot));
             body.innerHTML = '';
             
-            let onlineTotal = 0;
-            let balancePendingTotal = 0;
-            let balanceCollectedTotal = 0;
+            let onlineTotal = 0, balancePendingTotal = 0, balanceCollectedTotal = 0;
             
             filtered.forEach(b => {
                 const amountPaid = b.amount || 0;
@@ -625,34 +622,27 @@
                 else balancePendingTotal += balanceAtStudio;
                 
                 const tr = document.createElement('tr');
-                tr.className = isBalancePaid ? 'bg-emerald-50/40 transition-colors' : 'hover:bg-slate-50 transition-colors';
+                tr.className = isBalancePaid ? 'bg-emerald-50/40' : '';
                 tr.innerHTML = `
-                    <td class="px-8 py-6 font-black text-slate-800">${format12h(b.slot)}</td>
-                    <td class="px-8 py-6">
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 font-black text-slate-800">${format12h(b.slot)}</td>
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 whitespace-nowrap">
                         <div class="font-bold text-slate-900">${b.name}</div>
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${b.phone}</div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase">${b.phone}</div>
                     </td>
-                    <td class="px-8 py-6 text-center">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-700">
-                            Tempahan Sah
-                        </span>
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 text-center">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-700">Sah</span>
                     </td>
-                    <td class="px-8 py-6 text-center font-bold text-emerald-600">RM ${amountPaid.toFixed(2)}</td>
-                    <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-700' : 'text-amber-800') : 'text-slate-300'}">
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 text-center font-bold text-emerald-600">RM ${amountPaid.toFixed(2)}</td>
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-700' : 'text-amber-800') : 'text-slate-300'}">
                         ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
-                        ${isBalancePaid ? '<span class="block text-[8px] uppercase text-emerald-500 font-black mt-0.5 tracking-widest">(SELESAI)</span>' : ''}
                     </td>
-                    <td class="px-8 py-6 text-right">
-                        <div class="flex items-center justify-end space-x-4">
-                            <label class="flex items-center space-x-2 cursor-pointer group">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Terima Baki?</span>
-                                <input type="checkbox" ${isBalancePaid ? 'checked' : ''} 
-                                       onchange="updateBalancePaidStatus('${b.id}', this.checked)"
-                                       class="w-5 h-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                            </label>
-                            <div class="h-6 w-px bg-slate-200"></div>
-                            <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest hover:underline">Resit</button>
-                            <button onclick="removeBooking('${b.id}')" class="text-red-400 hover:text-red-600 transition-all p-1">
+                    <td class="px-6 py-4 sm:px-8 sm:py-6 text-right">
+                        <div class="flex items-center justify-end space-x-3">
+                            <input type="checkbox" ${isBalancePaid ? 'checked' : ''} 
+                                   onchange="updateBalancePaidStatus('${b.id}', this.checked)"
+                                   class="w-5 h-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                            <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest">Resit</button>
+                            <button onclick="removeBooking('${b.id}')" class="text-red-400 p-1">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
@@ -660,72 +650,71 @@
                 body.appendChild(tr);
             });
             document.getElementById('stat-total').innerText = filtered.length;
-            document.getElementById('stat-online').innerText = `RM ${onlineTotal.toFixed(2)}`;
-            document.getElementById('stat-balance-pending').innerText = `RM ${balancePendingTotal.toFixed(2)}`;
-            document.getElementById('stat-balance-collected').innerText = `RM ${balanceCollectedTotal.toFixed(2)}`;
+            document.getElementById('stat-online').innerText = `RM ${onlineTotal.toFixed(0)}`;
+            document.getElementById('stat-balance-pending').innerText = `RM ${balancePendingTotal.toFixed(0)}`;
+            document.getElementById('stat-balance-collected').innerText = `RM ${balanceCollectedTotal.toFixed(0)}`;
         };
 
         window.updateBalancePaidStatus = async (id, status) => {
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { balancePaid: status });
-                showToast(status ? 'Kutipan baki tunai direkodkan!' : 'Rekod kutipan baki dipadam');
+                showToast(status ? 'Baki setel!' : 'Rekod dikemaskini');
             } catch (err) { console.error(err); }
         };
 
         window.removeBooking = async (id) => {
-            if (window.confirm('Hapus rekod tempahan ini secara kekal?')) {
+            if (window.confirm('Padam rekod ini?')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                     await deleteDoc(docRef);
-                    showToast('Rekod berjaya dipadam', '🗑️');
+                    showToast('Rekod dipadam', '🗑️');
                 } catch (err) { console.error(err); }
             }
         };
 
         window.openPaymentModal = () => {
             if(!document.getElementById('cust-name').value || !document.getElementById('cust-phone').value) 
-                return showToast('Sila lengkapkan maklumat anda!', '⚠️');
-            if(!selectedSlot) return showToast('Sila pilih slot waktu dahulu!', '⚠️');
+                return showToast('Lengkapkan maklumat anda!', '⚠️');
+            if(!selectedSlot) return showToast('Pilih slot waktu!', '⚠️');
             document.getElementById('ui-modal-pay').innerText = `RM ${payNow.toFixed(2)}`;
             document.getElementById('payment-modal').classList.remove('hidden');
         };
+        
         window.closePaymentModal = () => document.getElementById('payment-modal')?.classList.add('hidden');
         
         window.switchView = (v) => {
             document.getElementById('client-view')?.classList.toggle('hidden', v !== 'client');
             document.getElementById('admin-view')?.classList.toggle('hidden', v !== 'admin');
-            
             const btnClient = document.getElementById('nav-client');
             const btnAdmin = document.getElementById('nav-admin');
-            
             if (v === 'admin') {
-                btnAdmin.className = 'px-6 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg';
-                btnClient.className = 'px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+                btnAdmin.className = 'px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white shadow-lg';
+                btnClient.className = 'px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
                 renderAdminDashboard();
             } else {
-                btnClient.className = 'px-6 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg';
-                btnAdmin.className = 'px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+                btnClient.className = 'px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-800 text-white shadow-lg';
+                btnAdmin.className = 'px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
             }
         };
         
         window.handleAdminAccess = () => {
-            if (!document.getElementById('admin-view').classList.contains('hidden')) {
-                switchView('client');
-            } else {
-                document.getElementById('login-modal')?.classList.remove('hidden');
-            }
+            if (!document.getElementById('admin-view').classList.contains('hidden')) switchView('client');
+            else document.getElementById('login-modal')?.classList.remove('hidden');
         };
+        
         window.closeAdminLogin = () => document.getElementById('login-modal')?.classList.add('hidden');
+        
         window.verifyAdmin = () => {
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin(); switchView('admin');
-            } else showToast('Kata laluan tidak sah!', '❌');
+            } else showToast('Kata laluan salah!', '❌');
         };
+        
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
-            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)">`); }
-            else showToast('Tiada bukti bayaran dijumpai', 'ℹ️');
+            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 12px;">`); }
+            else showToast('Tiada resit', 'ℹ️');
         };
 
         document.addEventListener('DOMContentLoaded', () => {
