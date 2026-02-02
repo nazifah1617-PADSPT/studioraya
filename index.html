@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Firebase & ToyyibPay</title>
+    <title>Studio Raya 2026 - Pembayaran QR & Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -52,10 +52,11 @@
     <main id="client-view" class="max-w-6xl mx-auto px-4 py-12">
         <header class="max-w-3xl mx-auto text-center mb-16">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Pakej Mini Studio Raya <br><span class="text-amber-800">Sungai Bakap 2026</span></h1>
-            <p class="text-slate-500 text-lg leading-relaxed">Pilih pakej dan slot masa anda. Bayaran online diproses secara selamat melalui ToyyibPay.</p>
+            <p class="text-slate-500 text-lg leading-relaxed">Pilih pakej dan slot masa anda. Sila buat bayaran melalui kod QR di langkah terakhir.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Kolom Kiri: Form & Info -->
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] space-y-3">
                     <h3 class="font-black text-amber-900 text-[10px] uppercase tracking-[0.2em]">Butiran Sesi</h3>
@@ -108,6 +109,7 @@
                 </div>
             </div>
 
+            <!-- Kolom Kanan: Slot Masa -->
             <div class="lg:col-span-7 space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 min-h-[600px] flex flex-col">
                     <div class="flex justify-between items-center mb-10">
@@ -123,7 +125,7 @@
                                 <p class="text-[10px] text-amber-700 font-black uppercase">Masa Dipilih</p>
                                 <p class="text-3xl font-black text-amber-900" id="ui-selected-slot">--:--</p>
                             </div>
-                            <button onclick="openPayment()" class="bg-amber-800 text-white px-8 py-5 rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all">TERUSKAN BAYARAN</button>
+                            <button onclick="openPaymentModal()" class="bg-amber-800 text-white px-8 py-5 rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all">BUAT BAYARAN</button>
                         </div>
                     </div>
                 </div>
@@ -136,31 +138,13 @@
         <div class="flex justify-between items-end mb-10">
             <div>
                 <h1 class="text-4xl font-black text-slate-900">Dashboard Pemilik</h1>
-                <p class="text-slate-500">Urus tempahan dan tetapan ToyyibPay.</p>
+                <p class="text-slate-500">Semak bukti bayaran dan sahkan tempahan.</p>
             </div>
-            <button onclick="toggleToyyibSettings()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">Tetapan API</button>
-        </div>
-
-        <!-- Tetapan ToyyibPay -->
-        <div id="toyyib-settings-panel" class="hidden bg-white p-8 rounded-[2rem] border border-slate-200 mb-10 shadow-sm space-y-6">
-            <h3 class="font-black text-slate-800">Konfigurasi ToyyibPay</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-400 uppercase">User Secret Key</label>
-                    <input type="password" id="tp-secret-key" class="w-full bg-slate-50 border rounded-xl p-4 font-mono text-sm" placeholder="Masukkan Secret Key">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-400 uppercase">Category Code</label>
-                    <input type="text" id="tp-cat-code" class="w-full bg-slate-50 border rounded-xl p-4 font-mono text-sm" placeholder="Masukkan Category Code">
-                </div>
-            </div>
-            <div class="flex items-center justify-between pt-4 border-t">
-                <p class="text-[10px] text-slate-400 font-bold italic">* Nilai ini telah disetkan mengikut kategori anda.</p>
-                <button onclick="saveToyyibSettings()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold">KEMASKINI TETAPAN</button>
+            <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100">
+                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="border-0 rounded-xl p-3 font-black bg-slate-50 outline-none text-sm">
             </div>
         </div>
 
-        <!-- Statistik -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
             <div class="bg-white p-8 rounded-[2rem] border border-slate-100">
                 <p class="text-[10px] font-black text-slate-400 uppercase">Total Tempahan</p>
@@ -171,11 +155,8 @@
                 <h3 id="stat-online" class="text-3xl font-black text-green-600">RM 0.00</h3>
             </div>
             <div class="bg-amber-50 p-8 rounded-[2rem] border border-amber-100">
-                <p class="text-[10px] font-black text-amber-600 uppercase">Baki Studio</p>
+                <p class="text-[10px] font-black text-amber-600 uppercase">Baki Perlu Kutip</p>
                 <h3 id="stat-balance" class="text-3xl font-black text-amber-800">RM 0.00</h3>
-            </div>
-            <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 mt-4 col-span-full">
-                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="border-0 rounded-xl p-3 font-black bg-slate-50 outline-none text-sm">
             </div>
         </div>
 
@@ -197,57 +178,50 @@
         </div>
     </main>
 
-    <!-- Modal Pembayaran -->
+    <!-- Modal Pembayaran QR -->
     <div id="payment-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
-        <div class="modal-overlay absolute inset-0" onclick="closePayment()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 p-8 sm:p-10 space-y-8">
+        <div class="modal-overlay absolute inset-0" onclick="closePaymentModal()"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 p-8 sm:p-10 space-y-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black">Pilihan Bayaran</h3>
-                <button onclick="closePayment()" class="text-slate-400 hover:text-slate-600">
+                <h3 class="text-2xl font-black">Lengkapkan Bayaran</h3>
+                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
             <div class="text-center py-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Jumlah Perlu Bayar</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Jumlah Perlu Dibayar</p>
                 <p id="ui-modal-pay" class="text-4xl font-black text-amber-800">RM 0.00</p>
             </div>
 
             <div class="space-y-4">
-                <button onclick="payWithToyyibPay()" id="btn-toyyib" class="w-full p-6 bg-slate-900 text-white rounded-3xl flex items-center justify-between group hover:bg-black transition-all">
-                    <div class="text-left">
-                        <span class="block text-xs font-black uppercase text-slate-400">Automatik</span>
-                        <span class="text-lg font-black">Online Banking (FPX)</span>
-                    </div>
-                    <img src="https://toyyibpay.com/img/logo-white.png" class="h-6" alt="ToyyibPay">
-                </button>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="selectQR('maybank')" id="qr-btn-maybank" class="flex flex-col items-center gap-2 p-4 border-2 rounded-2xl transition-all qr-selected">
+                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-6" alt="Maybank">
+                        <span class="text-[10px] font-black uppercase">Maybank MAE</span>
+                    </button>
+                    <button onclick="selectQR('tngo')" id="qr-btn-tngo" class="flex flex-col items-center gap-2 p-4 border-2 rounded-2xl border-slate-100 transition-all opacity-50">
+                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-6" alt="TNG">
+                        <span class="text-[10px] font-black uppercase">Touch 'n Go</span>
+                    </button>
+                </div>
 
-                <button onclick="showManualQR()" class="w-full p-6 border-2 border-slate-100 rounded-3xl flex items-center justify-between hover:border-amber-500 transition-all">
-                    <div class="text-left">
-                        <span class="block text-xs font-black uppercase text-slate-300">Manual</span>
-                        <span class="text-lg font-black text-slate-700">Scan QR & Upload Resit</span>
-                    </div>
-                    <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                </button>
+                <div class="bg-white p-6 rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner">
+                    <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-56 h-56 object-contain mb-4" alt="Scan QR">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">Sila imbas kod di atas & muat naik resit di bawah</p>
+                </div>
             </div>
+
+            <div class="space-y-3">
+                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Muat Naik Resit (Screenshot)</label>
+                <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-2 rounded-2xl">
+            </div>
+
+            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-xl hover:bg-amber-900 transition-all">SAHKAN & HANTAR TEMPAHAN</button>
         </div>
     </div>
 
-    <!-- Modal Manual QR -->
-    <div id="manual-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4">
-        <div class="modal-overlay absolute inset-0" onclick="closeManual()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md relative z-10 p-8 space-y-6">
-            <h3 class="text-xl font-black">Manual QR & Resit</h3>
-            <div class="bg-slate-50 p-6 rounded-[2rem] flex flex-col items-center border-2 border-dashed border-slate-200">
-                <img src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-48 h-48 mb-4 rounded-xl" alt="QR">
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Sila muat naik resit selepas bayar</p>
-            </div>
-            <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs p-2 bg-slate-50 rounded-xl border">
-            <button onclick="submitManual()" id="btn-submit-manual" class="w-full py-5 bg-amber-800 text-white rounded-2xl font-black shadow-xl">SIMPAN TEMPAHAN</button>
-        </div>
-    </div>
-
-    <!-- Modal Login -->
+    <!-- Modal Log Masuk Admin -->
     <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0" onclick="closeAdminLogin()"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm relative z-10 p-10 text-center">
@@ -283,11 +257,10 @@
         let payType = 'full';
         let totalCalculated = 0;
         let payNow = 0;
-        
-        // Tetapan ToyyibPay - Menggunakan Category Code yang anda berikan
-        let settings = JSON.parse(localStorage.getItem('studio_raya_2026_settings')) || { 
-            secretKey: 'w5x7srq7-rx5r-3t89-2ou2-k7361x2jewhn', 
-            catCode: 'Ajdiufd345f' 
+
+        const qrMap = {
+            maybank: "https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg",
+            tngo: "https://i.postimg.cc/mP386yYm/tng-qr.jpg"
         };
 
         window.showToast = (msg, icon = '✅') => {
@@ -319,14 +292,9 @@
                     try {
                         await signInWithCustomToken(auth, __initial_auth_token);
                         signedIn = true;
-                    } catch (tokenErr) {
-                        console.warn("Token mismatch, falling back to anonymous.");
-                    }
+                    } catch (tokenErr) { console.warn("Fallback to anon."); }
                 }
-
-                if (!signedIn) {
-                    await signInAnonymously(auth);
-                }
+                if (!signedIn) await signInAnonymously(auth);
 
                 onAuthStateChanged(auth, (u) => {
                     user = u;
@@ -339,45 +307,32 @@
                         setupDataListener();
                     }
                 });
-            } catch (err) {
-                console.error("Firebase Auth Error:", err);
-                showToast("Sistem gagal menyambung ke awan", "❌");
-            }
+            } catch (err) { console.error(err); }
         };
 
         const setupDataListener = () => {
             if (!user) return;
             const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
-            
             onSnapshot(colRef, (snap) => {
                 bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderTimeSlots();
                 renderAdminDashboard();
-            }, (err) => {
-                console.error("Firestore Permission Error:", err);
-            });
+            }, (err) => console.error(err));
         };
 
         window.updateCalculations = () => {
-            const baseEl = document.getElementById('package-select');
-            const paxEl = document.getElementById('extra-pax');
-            if(!baseEl || !paxEl) return;
-
-            const base = parseInt(baseEl.value);
-            const pax = parseInt(paxEl.value) || 1;
+            const base = parseInt(document.getElementById('package-select').value);
+            const pax = parseInt(document.getElementById('extra-pax').value) || 1;
             let extra = pax > 6 ? (pax - 6) * 5 : 0;
             totalCalculated = base + extra;
             payNow = payType === 'full' ? totalCalculated : 39;
             const balance = totalCalculated - payNow;
 
-            const payNowEl = document.getElementById('ui-pay-now');
-            if(payNowEl) payNowEl.innerText = `RM ${payNow.toFixed(2)}`;
-            
+            document.getElementById('ui-pay-now').innerText = `RM ${payNow.toFixed(2)}`;
             const balanceBox = document.getElementById('ui-balance-box');
             if (balanceBox) {
                 if (balance > 0) {
-                    const balanceAmtEl = document.getElementById('ui-balance-amount');
-                    if(balanceAmtEl) balanceAmtEl.innerText = `RM ${balance.toFixed(2)}`;
+                    document.getElementById('ui-balance-amount').innerText = `RM ${balance.toFixed(2)}`;
                     balanceBox.classList.remove('hidden');
                 } else balanceBox.classList.add('hidden');
             }
@@ -385,19 +340,15 @@
 
         window.setPaymentType = (type) => {
             payType = type;
-            const fullBtn = document.getElementById('pay-type-full');
-            const bookBtn = document.getElementById('pay-type-booking');
-            if(fullBtn) fullBtn.className = type === 'full' ? 'p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-slate-100 text-slate-400';
-            if(bookBtn) bookBtn.className = type === 'booking' ? 'p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-slate-100 text-slate-400';
+            document.getElementById('pay-type-full').className = type === 'full' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400';
+            document.getElementById('pay-type-booking').className = type === 'booking' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400';
             updateCalculations();
         };
 
         window.renderTimeSlots = () => {
             const grid = document.getElementById('slots-grid');
-            const dateEl = document.getElementById('booking-date');
-            if(!grid || !dateEl) return;
-            
-            const date = dateEl.value;
+            const date = document.getElementById('booking-date').value;
+            if(!grid) return;
             grid.innerHTML = '';
             const booked = bookings.filter(b => b.date === date && b.verified).map(b => b.slot);
             
@@ -413,49 +364,36 @@
                         document.querySelectorAll('.slot-available').forEach(s => s.classList.remove('bg-amber-800', 'text-white', 'border-amber-800'));
                         el.classList.add('bg-amber-800', 'text-white', 'border-amber-800');
                         selectedSlot = time24;
-                        const selSlotEl = document.getElementById('ui-selected-slot');
-                        if(selSlotEl) selSlotEl.innerText = format12h(time24);
-                        const selSummEl = document.getElementById('selection-summary');
-                        if(selSummEl) selSummEl.classList.remove('hidden');
+                        document.getElementById('ui-selected-slot').innerText = format12h(time24);
+                        document.getElementById('selection-summary').classList.remove('hidden');
                     };
                     grid.appendChild(el);
                 });
             }
         };
 
-        window.payWithToyyibPay = async () => {
-            if(!settings.secretKey || !settings.catCode) return showToast('ToyyibPay belum disetup!', '⚠️');
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            if(!name || !phone) return showToast('Lengkapkan maklumat!', '⚠️');
-
-            try {
-                const data = {
-                    name, phone, slot: selectedSlot, 
-                    date: document.getElementById('booking-date').value,
-                    amount: payNow, totalPrice: totalCalculated,
-                    verified: false, method: 'ToyyibPay', createdAt: new Date().toISOString()
-                };
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), data);
-                showToast('Menghalakan ke ToyyibPay...', '🚀');
-                // Aliran bayaran menggunakan Category Direct Link
-                setTimeout(() => window.location.href = `https://toyyibpay.com/${settings.catCode}`, 1000);
-            } catch (err) { 
-                console.error(err);
-                showToast('Gagal menyimpan tempahan', '❌'); 
+        window.selectQR = (provider) => {
+            const mBtn = document.getElementById('qr-btn-maybank');
+            const tBtn = document.getElementById('qr-btn-tngo');
+            const img = document.getElementById('qr-image');
+            if(provider === 'maybank') {
+                mBtn.classList.add('qr-selected'); mBtn.classList.remove('opacity-50');
+                tBtn.classList.remove('qr-selected'); tBtn.classList.add('opacity-50');
+                img.src = qrMap.maybank;
+            } else {
+                tBtn.classList.add('qr-selected'); tBtn.classList.remove('opacity-50');
+                mBtn.classList.remove('qr-selected'); mBtn.classList.add('opacity-50');
+                img.src = qrMap.tngo;
             }
         };
 
-        window.submitManual = () => {
+        window.submitBooking = () => {
             const input = document.getElementById('receipt-input');
             const file = input ? input.files[0] : null;
-            if(!file) return showToast('Sila muat naik resit!', '⚠️');
+            if(!file) return showToast('Sila muat naik bukti bayaran!', '⚠️');
             
-            const btn = document.getElementById('btn-submit-manual');
-            if(btn) {
-                btn.disabled = true;
-                btn.innerText = "Sila Tunggu...";
-            }
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true; btn.innerText = "Hantar...";
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -465,7 +403,7 @@
                     date: document.getElementById('booking-date').value,
                     slot: selectedSlot,
                     amount: payNow, totalPrice: totalCalculated,
-                    verified: false, receipt: e.target.result, method: 'Manual QR',
+                    verified: false, receipt: e.target.result,
                     createdAt: new Date().toISOString()
                 };
                 try {
@@ -473,12 +411,8 @@
                     showToast('Tempahan berjaya dihantar!');
                     setTimeout(() => location.reload(), 1500);
                 } catch (err) {
-                    console.error(err);
-                    showToast('Gagal menyimpan tempahan', '❌');
-                    if(btn) {
-                        btn.disabled = false;
-                        btn.innerText = "SIMPAN TEMPAHAN";
-                    }
+                    showToast('Gagal menghantar tempahan', '❌');
+                    btn.disabled = false; btn.innerText = "SAHKAN & HANTAR TEMPAHAN";
                 }
             };
             reader.readAsDataURL(file);
@@ -488,7 +422,6 @@
             const dateEl = document.getElementById('admin-filter-date');
             const body = document.getElementById('admin-table-body');
             if(!dateEl || !body) return;
-
             const fDate = dateEl.value;
             const filtered = bookings.filter(b => b.date === fDate).sort((a,b) => a.slot.localeCompare(b.slot));
             body.innerHTML = '';
@@ -499,22 +432,19 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="px-8 py-6 font-black">${format12h(b.slot)}</td>
-                    <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase">${b.method}</span></td>
+                    <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase">${b.phone}</span></td>
                     <td class="px-8 py-6 text-center"><span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${b.verified ? 'Sah' : 'Pending'}</span></td>
                     <td class="px-8 py-6 text-center font-bold">RM ${(b.amount || 0).toFixed(2)}</td>
                     <td class="px-8 py-6 text-right space-x-2">
-                        <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px]">INFO</button>
-                        ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[9px]">SAH</button>` : ''}
-                        <button onclick="removeBooking('${b.id}')" class="text-red-500 font-bold text-[10px]">PADAM</button>
+                        <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase">Resit</button>
+                        ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[9px] uppercase">Sahkan</button>` : ''}
+                        <button onclick="removeBooking('${b.id}')" class="text-red-500 font-bold text-[10px] uppercase">Hapus</button>
                     </td>`;
                 body.appendChild(tr);
             });
-            const statTotalEl = document.getElementById('stat-total');
-            if(statTotalEl) statTotalEl.innerText = filtered.length;
-            const statOnlineEl = document.getElementById('stat-online');
-            if(statOnlineEl) statOnlineEl.innerText = `RM ${online.toFixed(2)}`;
-            const statBalanceEl = document.getElementById('stat-balance');
-            if(statBalanceEl) statBalanceEl.innerText = `RM ${balance.toFixed(2)}`;
+            document.getElementById('stat-total').innerText = filtered.length;
+            document.getElementById('stat-online').innerText = `RM ${online.toFixed(2)}`;
+            document.getElementById('stat-balance').innerText = `RM ${balance.toFixed(2)}`;
         };
 
         window.confirmBooking = async (id) => {
@@ -524,66 +454,42 @@
         };
 
         window.removeBooking = async (id) => {
-            if(confirm('Padam tempahan?')) {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-                await deleteDoc(docRef);
+            if(confirm('Hapus tempahan ini?')) {
+                await deleteDoc(docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id));
                 showToast('Tempahan dipadam');
             }
         };
 
-        window.openPayment = () => {
-            const nameVal = document.getElementById('cust-name')?.value;
-            const phoneVal = document.getElementById('cust-phone')?.value;
-            if(!nameVal || !phoneVal) 
+        window.openPaymentModal = () => {
+            if(!document.getElementById('cust-name').value || !document.getElementById('cust-phone').value) 
                 return showToast('Sila lengkapkan maklumat!', '⚠️');
-            
-            const modalPayEl = document.getElementById('ui-modal-pay');
-            if(modalPayEl) modalPayEl.innerText = `RM ${payNow.toFixed(2)}`;
-            const modalEl = document.getElementById('payment-modal');
-            if(modalEl) modalEl.classList.remove('hidden');
+            document.getElementById('ui-modal-pay').innerText = `RM ${payNow.toFixed(2)}`;
+            document.getElementById('payment-modal').classList.remove('hidden');
         };
-        window.closePayment = () => document.getElementById('payment-modal')?.classList.add('hidden');
-        window.showManualQR = () => document.getElementById('manual-modal')?.classList.remove('hidden');
-        window.closeManual = () => document.getElementById('manual-modal')?.classList.add('hidden');
+        window.closePaymentModal = () => document.getElementById('payment-modal')?.classList.add('hidden');
         window.switchView = (v) => {
             document.getElementById('client-view')?.classList.toggle('hidden', v !== 'client');
             document.getElementById('admin-view')?.classList.toggle('hidden', v !== 'admin');
+            if(v === 'admin') renderAdminDashboard();
         };
         window.handleAdminAccess = () => document.getElementById('login-modal')?.classList.remove('hidden');
         window.closeAdminLogin = () => document.getElementById('login-modal')?.classList.add('hidden');
         window.verifyAdmin = () => {
-            const passVal = document.getElementById('admin-password')?.value;
-            if(passVal === 'iqmal271') {
-                closeAdminLogin(); switchView('admin'); renderAdminDashboard();
-            } else showToast('Kata laluan salah!', '❌');
-        };
-        window.toggleToyyibSettings = () => document.getElementById('toyyib-settings-panel')?.classList.toggle('hidden');
-        window.saveToyyibSettings = () => {
-            settings.secretKey = document.getElementById('tp-secret-key')?.value || '';
-            settings.catCode = document.getElementById('tp-cat-code')?.value || '';
-            localStorage.setItem('studio_raya_2026_settings', JSON.stringify(settings));
-            showToast('Tetapan Disimpan');
-            toggleToyyibSettings();
+            if(document.getElementById('admin-password').value === 'iqmal271') {
+                closeAdminLogin(); switchView('admin');
+            } else showToast('Salah!', '❌');
         };
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
-            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}">`); }
-            else showToast('Tiada resit manual', 'ℹ️');
+            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%">`); }
+            else showToast('Tiada resit', 'ℹ️');
         };
 
         document.addEventListener('DOMContentLoaded', () => {
             initFirebase();
             const today = new Date().toISOString().split('T')[0];
-            const bookingDateEl = document.getElementById('booking-date');
-            if(bookingDateEl) bookingDateEl.value = today;
-            const adminFilterDateEl = document.getElementById('admin-filter-date');
-            if(adminFilterDateEl) adminFilterDateEl.value = today;
-            
-            const secretKeyEl = document.getElementById('tp-secret-key');
-            if(secretKeyEl) secretKeyEl.value = settings.secretKey;
-            const catCodeEl = document.getElementById('tp-cat-code');
-            if(catCodeEl) catCodeEl.value = settings.catCode;
-            
+            document.getElementById('booking-date').value = today;
+            document.getElementById('admin-filter-date').value = today;
             updateCalculations();
         });
     </script>
