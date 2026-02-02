@@ -3,127 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Tempahan Langsung</title>
+    <title>Studio Raya 2026 - Sistem Tempahan Rasmi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .slot-booked { background-color: #fee2e2; border-color: #fecaca; color: #991b1b; cursor: not-allowed; opacity: 0.7; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+        .slot-booked { background-color: #fee2e2; border-color: #fecaca; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
         .slot-available { cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .slot-available:hover { transform: translateY(-2px); border-color: #92400e; background-color: #fffbeb; }
-        .modal-overlay { background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); }
+        .slot-available:hover { transform: translateY(-3px); border-color: #92400e; background-color: #fffbeb; box-shadow: 0 10px 15px -3px rgba(146, 64, 14, 0.1); }
+        .modal-overlay { background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); }
         .qr-selected { border-color: #92400e; background-color: #fffbeb; ring: 2px; ring-color: #92400e; }
         
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        
+        .animate-subtle-fade { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900 overflow-x-hidden">
 
     <!-- Notifikasi Toast -->
     <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[110] transform transition-all duration-300 translate-y-[-150%] opacity-0">
-        <div class="bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-            <span id="toast-icon"></span>
-            <span id="toast-msg" class="text-sm font-bold"></span>
+        <div class="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700">
+            <span id="toast-icon" class="text-xl"></span>
+            <span id="toast-msg" class="text-sm font-bold tracking-tight"></span>
         </div>
     </div>
 
     <!-- Navigasi -->
-    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                    <div class="w-12 h-12 bg-amber-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg">S</div>
+                <div class="flex items-center space-x-4 cursor-pointer group" onclick="location.reload()">
+                    <div class="w-12 h-12 bg-amber-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-xl shadow-amber-900/20 group-hover:scale-105 transition-transform">S</div>
                     <div>
-                        <span class="text-xl font-extrabold text-slate-800 block leading-none">Studio Raya <span class="text-amber-800">2026</span></span>
-                        <span id="connection-status" class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Menghubung...</span>
+                        <span class="text-xl font-extrabold text-slate-900 block leading-none tracking-tighter">Studio Raya <span class="text-amber-800">2026</span></span>
+                        <span id="connection-status" class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Sistem Sedang Dimuatkan...</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="switchView('client')" id="nav-client" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg shadow-amber-900/10 transition-all">Tempahan</button>
-                    <button onclick="handleAdminAccess()" id="nav-admin" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all">Pemilik</button>
+                    <button onclick="switchView('client')" id="nav-client" class="px-6 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg shadow-amber-900/10 hover:bg-amber-900 transition-all">Tempahan</button>
+                    <button onclick="handleAdminAccess()" id="nav-admin" class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all">Papan Pemilik</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Tampilan Pelanggan -->
-    <main id="client-view" class="max-w-6xl mx-auto px-4 py-12">
-        <header class="max-w-3xl mx-auto text-center mb-16">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Pakej Mini Studio Raya <br><span class="text-amber-800">Sungai Bakap 2026</span></h1>
-            <p class="text-slate-500 text-lg leading-relaxed">Silih pilih pakej dan slot masa anda di bawah. Tempahan disahkan secara automatik selepas bayaran.</p>
+    <!-- Paparan Pelanggan -->
+    <main id="client-view" class="max-w-6xl mx-auto px-4 py-12 animate-subtle-fade">
+        <header class="max-w-3xl mx-auto text-center mb-16 space-y-4">
+            <span class="px-4 py-1.5 bg-amber-100 text-amber-800 text-[10px] font-black rounded-full uppercase tracking-[0.2em]">Koleksi Eksklusif Lebaran</span>
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tighter leading-tight">Abadikan Memori <br><span class="text-amber-800 italic">Terindah Anda</span></h1>
+            <p class="text-slate-500 text-lg max-w-xl mx-auto">Sila pilih pakej dan slot masa di bawah. Tempahan disahkan secara automatik sebaik sahaja resit dimuat naik.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <!-- Bahagian Kiri: Borang -->
             <div class="lg:col-span-5 space-y-6">
-                <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] space-y-3">
-                    <h3 class="font-black text-amber-900 text-[10px] uppercase tracking-[0.2em]">Butiran Sesi</h3>
-                    <ul class="text-[11px] text-amber-800 space-y-2 font-bold">
-                        <li>• 20 minit sesi (5 min persiapan, 15 min photoshoot)</li>
-                        <li>• Shoot & Edit (Unlimited Photos)</li>
-                        <li>• Softcopy via Google Drive (48 jam)</li>
-                        <li>• Pax ke-7 hingga 10: +RM5/pax</li>
-                    </ul>
-                </div>
-
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
-                    <h2 class="text-xl font-black mb-8 text-slate-800">Maklumat Tempahan</h2>
-                    <div class="space-y-5">
-                        <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all font-medium" placeholder="Nama Penuh">
-                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all font-medium" placeholder="No. WhatsApp (Cth: 0123456789)">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200/60 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+                    <h2 class="text-xl font-bold mb-8 text-slate-800 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-black">01</span>
+                        Maklumat Peribadi
+                    </h2>
+                    
+                    <div class="space-y-6 relative z-10">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama Penuh</label>
+                            <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold" placeholder="Cth: Muhammad Izzat">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">No. WhatsApp</label>
+                            <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 focus:bg-white transition-all font-semibold" placeholder="Cth: 0112345678">
+                        </div>
                         
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pakej</label>
-                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilihan Pakej</label>
+                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none focus:border-amber-500">
                                     <option value="89">Sebelum Puasa (RM89)</option>
                                     <option value="99">Bulan Puasa (RM99)</option>
                                     <option value="150">Raya Pertama (RM150)</option>
                                 </select>
                             </div>
-                            <div>
+                            <div class="space-y-2">
                                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Pax</label>
-                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none">
+                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none focus:border-amber-500">
                             </div>
                         </div>
 
-                        <div class="pt-4">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-1">Mod Bayaran</label>
+                        <div class="pt-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-4 block ml-1">Mod Pembayaran</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all">BAYARAN PENUH</button>
-                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all">BOOKING (RM39)</button>
+                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all">BAYAR PENUH</button>
+                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all">DEPOSIT (RM39)</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-amber-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
-                    <p class="text-[10px] uppercase font-black text-amber-300/80 mb-2">Jumlah Bayaran Sekarang</p>
-                    <h3 id="ui-pay-now" class="text-5xl font-black tracking-tighter">RM 89.00</h3>
-                    <div id="ui-balance-box" class="hidden mt-4 pt-4 border-t border-white/10">
-                        <p class="text-[10px] text-amber-200/60 font-black uppercase">Baki di studio:</p>
-                        <p id="ui-balance-amount" class="text-xl font-bold">RM 0.00</p>
+                <!-- Kad Harga -->
+                <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <p class="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-2">Jumlah Perlu Bayar Sekarang</p>
+                        <h3 id="ui-pay-now" class="text-5xl font-black tracking-tighter">RM 89.00</h3>
+                        <div id="ui-balance-box" class="hidden mt-6 pt-6 border-t border-white/10 animate-subtle-fade">
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Baki perlu dijelaskan di studio:</p>
+                            <p id="ui-balance-amount" class="text-2xl font-bold text-amber-500 mt-1">RM 0.00</p>
+                        </div>
                     </div>
+                    <!-- Kesan Visual Hiasan -->
+                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-800/20 rounded-full blur-3xl group-hover:bg-amber-800/40 transition-all duration-700"></div>
+                </div>
+                
+                <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem] space-y-4">
+                    <h3 class="font-black text-amber-900 text-[10px] uppercase tracking-[0.2em]">Terma & Syarat Sesi</h3>
+                    <ul class="text-[11px] text-amber-800 space-y-2.5 font-bold leading-relaxed">
+                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Sesi 20 minit (5 min persiapan, 15 min rakaman)</li>
+                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Shoot & Edit (Unlimited Photos)</li>
+                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Penghantaran Softcopy via Google Drive (48 jam)</li>
+                        <li class="flex items-start gap-2 text-amber-900/70"><span class="text-amber-600">•</span> Tambahan Pax ke-7 hingga 10: RM5/pax</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="lg:col-span-7 space-y-6">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 min-h-[600px] flex flex-col">
-                    <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-xl font-black text-slate-800">Pilih Slot Masa</h2>
-                        <input type="date" id="booking-date" onchange="renderTimeSlots()" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black text-sm outline-none focus:border-amber-500">
+            <!-- Bahagian Kanan: Slot Masa -->
+            <div class="lg:col-span-7 space-y-8">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200/60 min-h-[600px] flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-black">02</span>
+                            Pilih Jadual Masa
+                        </h2>
+                        <div class="relative w-full sm:w-auto">
+                            <input type="date" id="booking-date" onchange="renderTimeSlots()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black text-sm outline-none focus:border-amber-500 cursor-pointer">
+                        </div>
                     </div>
                     
-                    <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
-                    
-                    <div id="selection-summary" class="hidden mt-auto pt-8">
-                        <div class="p-6 bg-amber-50 rounded-[2rem] border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <p class="text-[10px] text-amber-700 font-black uppercase">Masa Dipilih</p>
-                                <p class="text-3xl font-black text-amber-900" id="ui-selected-slot">--:--</p>
+                    <div id="slots-container" class="space-y-12">
+                        <!-- Sesi Siang -->
+                        <div>
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center shadow-sm border border-orange-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Siang</h3>
+                                    <p class="text-xs font-bold text-slate-600">9.00 AM - 7.00 PM</p>
+                                </div>
                             </div>
-                            <button onclick="openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-8 py-5 rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all active:scale-95">TERUSKAN BAYARAN</button>
+                            <div id="day-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                        </div>
+
+                        <!-- Sesi Malam -->
+                        <div>
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm border border-indigo-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sesi Malam</h3>
+                                    <p class="text-xs font-bold text-slate-600">8.30 PM - 11.00 PM</p>
+                                </div>
+                            </div>
+                            <div id="night-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="selection-summary" class="hidden mt-auto pt-10">
+                        <div class="p-8 bg-amber-50 rounded-[2.5rem] border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                            <div class="text-center sm:text-left">
+                                <p class="text-[10px] text-amber-700 font-black uppercase tracking-[0.2em] mb-1">Masa Dipilih</p>
+                                <p class="text-4xl font-black text-amber-900 tracking-tighter" id="ui-selected-slot">--:--</p>
+                            </div>
+                            <button onclick="openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-12 py-5 rounded-2xl font-black shadow-xl shadow-amber-900/20 hover:bg-amber-900 transition-all active:scale-95 text-sm uppercase tracking-wider">Teruskan Bayaran</button>
                         </div>
                     </div>
                 </div>
@@ -132,48 +188,49 @@
     </main>
 
     <!-- Dashboard Pemilik -->
-    <main id="admin-view" class="max-w-7xl mx-auto px-4 py-12 hidden">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
-            <div>
-                <h1 class="text-4xl font-black text-slate-900">Dashboard Pemilik</h1>
-                <p class="text-slate-500">Semua tempahan disahkan secara automatik oleh sistem.</p>
+    <main id="admin-view" class="max-w-7xl mx-auto px-4 py-12 hidden animate-subtle-fade">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-8">
+            <div class="space-y-2">
+                <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-full uppercase tracking-widest">Pengurusan Studio</span>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tighter">Papan Kawalan Pemilik</h1>
+                <p class="text-slate-500 font-medium">Urus kutipan tunai dan pantau jadual tempahan pelanggan.</p>
             </div>
-            <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-3">Tapis Tarikh</span>
-                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="border-0 rounded-xl p-3 font-black bg-slate-50 outline-none text-sm">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Total Tempahan</p>
-                <h3 id="stat-total" class="text-2xl font-black">0</h3>
-            </div>
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Kutipan Online</p>
-                <h3 id="stat-online" class="text-2xl font-black text-green-600">RM 0.00</h3>
-            </div>
-            <div class="bg-amber-50 p-6 rounded-[2rem] border border-amber-100 shadow-sm">
-                <p class="text-[10px] font-black text-amber-600 uppercase mb-2">Baki Belum Dikutip</p>
-                <h3 id="stat-balance-pending" class="text-2xl font-black text-amber-800">RM 0.00</h3>
-            </div>
-            <div class="bg-emerald-50 p-6 rounded-[2rem] border border-emerald-100 shadow-sm">
-                <p class="text-[10px] font-black text-emerald-600 uppercase mb-2">Baki Sudah Dikutip</p>
-                <h3 id="stat-balance-collected" class="text-2xl font-black text-emerald-700">RM 0.00</h3>
+            <div class="flex items-center gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Tapis Tarikh</span>
+                <input type="date" id="admin-filter-date" onchange="renderAdminDashboard()" class="border-0 rounded-xl p-3 font-black bg-slate-50 outline-none text-sm focus:ring-2 focus:ring-amber-500">
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Total Tempahan</p>
+                <h3 id="stat-total" class="text-3xl font-black text-slate-900">0</h3>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Kutipan Online</p>
+                <h3 id="stat-online" class="text-3xl font-black text-emerald-600">RM 0.00</h3>
+            </div>
+            <div class="bg-amber-50 p-8 rounded-[2.5rem] border border-amber-100 shadow-sm">
+                <p class="text-[10px] font-black text-amber-600 uppercase mb-3 tracking-widest">Baki Belum Dikutip</p>
+                <h3 id="stat-balance-pending" class="text-3xl font-black text-amber-800">RM 0.00</h3>
+            </div>
+            <div class="bg-emerald-50 p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm">
+                <p class="text-[10px] font-black text-emerald-600 uppercase mb-3 tracking-widest">Baki Sudah Dikutip</p>
+                <h3 id="stat-balance-collected" class="text-3xl font-black text-emerald-700">RM 0.00</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b font-medium">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b border-slate-100">
                         <tr>
                             <th class="px-8 py-6">Masa</th>
                             <th class="px-8 py-6">Pelanggan</th>
                             <th class="px-8 py-6 text-center">Status</th>
-                            <th class="px-8 py-6 text-center">Dibayar Online</th>
-                            <th class="px-8 py-6 text-center text-amber-700">Baki Di Studio</th>
-                            <th class="px-8 py-6 text-right">Kutipan Baki?</th>
+                            <th class="px-8 py-6 text-center text-emerald-600">Online (Deposit)</th>
+                            <th class="px-8 py-6 text-center text-amber-700">Tunai (Baki)</th>
+                            <th class="px-8 py-6 text-right">Tindakan</th>
                         </tr>
                     </thead>
                     <tbody id="admin-table-body" class="divide-y divide-slate-50 font-medium"></tbody>
@@ -183,125 +240,128 @@
     </main>
 
     <!-- Modal Pembayaran QR -->
-    <div id="payment-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+    <div id="payment-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0" onclick="closePaymentModal()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-lg relative z-10 p-8 sm:p-10 space-y-8 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg relative z-10 p-8 sm:p-10 space-y-8 max-h-[90vh] overflow-y-auto animate-subtle-fade">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black">Lengkapkan Bayaran</h3>
-                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <h3 class="text-2xl font-black tracking-tight text-slate-900">Pembayaran Deposit</h3>
+                <button onclick="closePaymentModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div class="text-center py-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Jumlah Perlu Dibayar</p>
-                <p id="ui-modal-pay" class="text-4xl font-black text-amber-800">RM 0.00</p>
+            <div class="text-center py-8 bg-slate-50 rounded-[2rem] border border-slate-200/60">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Amaun Perlu Dibayar</p>
+                <p id="ui-modal-pay" class="text-5xl font-black text-amber-800 tracking-tighter">RM 0.00</p>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="selectQR('maybank')" id="qr-btn-maybank" class="flex flex-col items-center gap-2 p-4 border-2 rounded-2xl transition-all qr-selected">
-                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-6" alt="Maybank">
-                        <span class="text-[10px] font-black uppercase">Maybank MAE</span>
+                    <button onclick="selectQR('maybank')" id="qr-btn-maybank" class="flex flex-col items-center gap-3 p-5 border-2 rounded-2xl transition-all qr-selected group">
+                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-8 group-hover:scale-110 transition-transform" alt="Maybank">
+                        <span class="text-[10px] font-black uppercase tracking-widest">Maybank MAE</span>
                     </button>
-                    <button onclick="selectQR('tngo')" id="qr-btn-tngo" class="flex flex-col items-center gap-2 p-4 border-2 rounded-2xl border-slate-100 transition-all opacity-50">
-                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-6" alt="TNG">
-                        <span class="text-[10px] font-black uppercase">Touch 'n Go</span>
+                    <button onclick="selectQR('tngo')" id="qr-btn-tngo" class="flex flex-col items-center gap-3 p-5 border-2 rounded-2xl border-slate-100 transition-all opacity-50 group">
+                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-8 group-hover:scale-110 transition-transform" alt="TNG">
+                        <span class="text-[10px] font-black uppercase tracking-widest">Touch 'n Go</span>
                     </button>
                 </div>
 
-                <div class="bg-white p-6 rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner">
-                    <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-56 h-56 object-contain mb-4" alt="Scan QR">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">Imbas kod di atas & muat naik resit bayaran</p>
+                <div class="bg-white p-8 rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner group">
+                    <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-64 h-64 object-contain mb-6 rounded-xl group-hover:scale-105 transition-transform duration-500" alt="Kod QR">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center">Sila imbas kod di atas & muat naik resit</p>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Muat Naik Resit (Screenshot)</label>
-                <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-2 rounded-2xl">
+                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Muat Naik Resit (Tangkapan Skrin)</label>
+                <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-3 rounded-2xl border-2 border-dashed border-slate-200">
             </div>
 
-            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-xl hover:bg-amber-900 transition-all active:scale-95">HANTAR TEMPAHAN</button>
+            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-2xl shadow-amber-900/30 hover:bg-amber-900 transition-all active:scale-95 uppercase tracking-widest text-sm">Hantar Tempahan</button>
         </div>
     </div>
 
-    <!-- Modal Success & WhatsApp Sender -->
+    <!-- Modal Kejayaan & WhatsApp -->
     <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-110 p-8 space-y-6 animate-in fade-in zoom-in duration-300">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-[110] p-8 sm:p-10 space-y-8 animate-subtle-fade">
             <div class="text-center">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h2 class="text-2xl font-black text-slate-900">Tempahan Selesai!</h2>
-                <p class="text-slate-500 text-sm">Sila klik butang di bawah untuk menghantar butiran ke studio.</p>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tighter">Tempahan Selesai!</h2>
+                <p class="text-slate-500 font-medium mt-2">Terima kasih. Sila hantar butiran ini ke WhatsApp studio untuk semakan akhir.</p>
             </div>
 
-            <!-- Preview Slip -->
-            <div class="bg-white border-2 border-slate-100 rounded-3xl p-8 space-y-6">
+            <div class="bg-white border-2 border-slate-100 rounded-[2rem] p-8 space-y-8 shadow-sm">
                 <div class="flex justify-between items-start border-b border-slate-100 pb-6">
                     <div>
-                        <h3 class="text-2xl font-black text-amber-800 uppercase tracking-tighter leading-none">Studio Raya 2026</h3>
+                        <h3 class="text-xl font-black text-amber-800 uppercase tracking-tighter leading-none">Slip Rasmi Sesi</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">ID Rujukan</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID Rujukan</p>
                         <p id="rcpt-ref" class="text-sm font-black text-slate-900">#RAYA-0000</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-8">
-                    <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div class="space-y-5">
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pelanggan</p>
-                            <p id="rcpt-name" class="font-bold text-slate-800 text-lg">-</p>
-                            <p id="rcpt-phone" class="text-xs text-slate-500 font-medium">-</p>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pelanggan</p>
+                            <p id="rcpt-name" class="font-bold text-slate-800 text-lg leading-tight">-</p>
+                            <p id="rcpt-phone" class="text-xs text-slate-500 font-semibold">-</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pakej & Kapasiti</p>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pakej & Kapasiti</p>
                             <p id="rcpt-pax" class="font-bold text-slate-800">-</p>
                         </div>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-5">
                         <div>
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Tarikh Janji Temu</p>
-                            <p id="rcpt-date" class="font-bold text-slate-800 text-sm">-</p>
-                            <p id="rcpt-slot" class="text-lg font-black text-amber-800 uppercase">-</p>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Jadual Sesi</p>
+                            <p id="rcpt-date" class="font-bold text-slate-800">-</p>
+                            <p id="rcpt-slot" class="text-xl font-black text-amber-800 uppercase mt-1">-</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 rounded-2xl p-6 space-y-3">
+                <div class="bg-slate-50 rounded-2xl p-6 space-y-4">
                     <div class="flex justify-between text-xs font-bold">
-                        <span class="text-slate-400 uppercase tracking-widest">Amaun Deposit</span>
+                        <span class="text-slate-400 uppercase tracking-widest">Deposit Dibayar</span>
                         <span id="rcpt-amount" class="text-slate-900 font-black">RM 0.00</span>
                     </div>
-                    <div class="flex justify-between text-xs border-t border-slate-200 pt-3">
-                        <span class="text-amber-800 font-black uppercase tracking-widest">Baki Di Studio</span>
-                        <span id="rcpt-balance" class="font-black text-amber-800 text-lg">RM 0.00</span>
+                    <div class="flex justify-between text-xs border-t border-slate-200 pt-4">
+                        <span class="text-amber-800 font-black uppercase tracking-widest">Baki Dibayar Di Studio</span>
+                        <span id="rcpt-balance" class="text-amber-800 font-black text-2xl tracking-tighter">RM 0.00</span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <button onclick="sendToWhatsApp()" class="bg-[#25D366] text-white py-5 rounded-2xl font-black shadow-xl flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95 text-sm">
+            <div class="flex flex-col gap-4">
+                <button onclick="sendToWhatsApp()" class="bg-[#25D366] text-white py-5 rounded-2xl font-black shadow-xl shadow-green-900/10 flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95 text-sm uppercase tracking-widest">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.903-6.16 2.544-1.64 1.641-2.543 3.841-2.543 6.162 0 1.611.433 3.191 1.245 4.578L3.394 24l4.695-1.231c1.332.727 2.83 1.111 4.35 1.111h.001c4.809 0 8.711-3.903 8.711-8.711 0-2.321-.904-4.521-2.545-6.162-1.641-1.641-3.841-2.544-6.162-2.544zM7.191 10.119c.148-.329.493-.541.83-.541.148 0 .294.032.423.088.13.056.242.144.331.258.113.144.186.314.214.492.027.177.011.359-.047.527l-.464 1.026c.307.399.664.756 1.063 1.063l1.026-.464c.168-.058.35-.074.527-.047.178.028.348.101.492.214.114.089.202.201.258.331.056.129.088.275.088.423 0 .337-.212.682-.541.83l-1.026.464c-.399-.307-.756-.664-1.063-1.063l.464-1.026c.058-.168.074-.35.047-.527a.64.64 0 00-.214-.492.65.65 0 00-.331-.258z"/></svg>
-                    HANTAR TEMPAHAN KE WHATSAPP STUDIO
+                    Hantar Ke WhatsApp Studio
                 </button>
-                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all text-sm uppercase tracking-widest">
-                    TEMPAH LAGI / TUTUP
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all text-[10px] uppercase tracking-[0.3em]">
+                    Tutup & Tempah Baru
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Log Masuk Admin -->
-    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- Modal Login Pemilik -->
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 animate-subtle-fade">
         <div class="modal-overlay absolute inset-0" onclick="closeAdminLogin()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-sm relative z-10 p-10 text-center">
-            <h3 class="text-xl font-black mb-6">Akses Pemilik</h3>
-            <input type="password" id="admin-password" class="w-full border-2 border-slate-100 rounded-2xl p-4 text-center mb-6 font-bold outline-none" placeholder="Kata Laluan">
-            <button onclick="verifyAdmin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all">MASUK</button>
+        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm relative z-10 p-12 text-center">
+            <div class="w-20 h-20 bg-amber-100 text-amber-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-black mb-2 text-slate-900 tracking-tight">Log Masuk Pemilik</h3>
+            <p class="text-slate-400 text-sm mb-8 font-semibold">Sila masukkan kata laluan keselamatan.</p>
+            <input type="password" id="admin-password" class="w-full border-2 border-slate-100 rounded-2xl p-4 text-center mb-6 font-black outline-none focus:border-amber-500 transition-all bg-slate-50" placeholder="••••••••">
+            <button onclick="verifyAdmin()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-black transition-all shadow-xl uppercase tracking-widest text-sm">Masuk Dashboard</button>
         </div>
     </div>
 
@@ -310,6 +370,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // Konfigurasi Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDex4zM27ee0IyUNn_3XllTenOjkmxZL80",
             authDomain: "studio-sg-bakap.firebaseapp.com",
@@ -332,6 +393,11 @@
         let totalCalculated = 0;
         let payNow = 0;
         let currentBookingData = null;
+
+        const qrMap = {
+            maybank: "https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg",
+            tngo: "https://i.postimg.cc/mP386yYm/tng-qr.jpg"
+        };
 
         window.showToast = (msg, icon = '✅') => {
             const toast = document.getElementById('toast');
@@ -359,10 +425,8 @@
             try {
                 let signedIn = false;
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                        signedIn = true;
-                    } catch (tokenErr) { console.warn("Fallback."); }
+                    try { await signInWithCustomToken(auth, __initial_auth_token); signedIn = true; } 
+                    catch (e) { console.warn("Fallback."); }
                 }
                 if (!signedIn) await signInAnonymously(auth);
 
@@ -371,8 +435,8 @@
                     if (user) {
                         const statusEl = document.getElementById('connection-status');
                         if(statusEl) {
-                            statusEl.innerText = "Firebase Aktif";
-                            statusEl.classList.replace('text-slate-400', 'text-green-500');
+                            statusEl.innerText = "Sistem Aktif & Terhubung";
+                            statusEl.classList.replace('text-slate-400', 'text-emerald-500');
                         }
                         setupDataListener();
                     }
@@ -416,31 +480,45 @@
         };
 
         window.renderTimeSlots = () => {
-            const grid = document.getElementById('slots-grid');
+            const dayGrid = document.getElementById('day-slots-grid');
+            const nightGrid = document.getElementById('night-slots-grid');
             const date = document.getElementById('booking-date').value;
-            if(!grid) return;
-            grid.innerHTML = '';
-            // Filter all verified bookings (now auto-verified)
+            if(!dayGrid || !nightGrid) return;
+            
+            dayGrid.innerHTML = '';
+            nightGrid.innerHTML = '';
+            
             const booked = bookings.filter(b => b.date === date && b.verified).map(b => b.slot);
             
-            for(let h=9; h<22; h++) {
-                if(h === 19) continue;
+            const createSlot = (time24, container) => {
+                const isBooked = booked.includes(time24);
+                const el = document.createElement('div');
+                el.className = `p-4 text-center border-2 rounded-2xl text-xs font-black tracking-tight transition-all ${isBooked ? 'slot-booked' : 'slot-available bg-white border-slate-100'}`;
+                el.innerText = format12h(time24);
+                
+                if(!isBooked) el.onclick = () => {
+                    document.querySelectorAll('.slot-available').forEach(s => s.classList.remove('bg-amber-800', 'text-white', 'border-amber-800', 'shadow-lg', 'shadow-amber-900/20'));
+                    el.classList.add('bg-amber-800', 'text-white', 'border-amber-800', 'shadow-lg', 'shadow-amber-900/20');
+                    selectedSlot = time24;
+                    document.getElementById('ui-selected-slot').innerText = format12h(time24);
+                    document.getElementById('selection-summary').classList.remove('hidden');
+                };
+                container.appendChild(el);
+            };
+
+            // Sesi Siang: 9.00 AM - 7.00 PM
+            for(let h=9; h<19; h++) {
                 [0, 30].forEach(m => {
                     const time24 = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                    const isBooked = booked.includes(time24);
-                    const el = document.createElement('div');
-                    el.className = `p-4 text-center border-2 rounded-2xl text-xs font-bold transition-all ${isBooked ? 'slot-booked' : 'slot-available bg-white border-slate-100'}`;
-                    el.innerText = format12h(time24);
-                    if(!isBooked) el.onclick = () => {
-                        document.querySelectorAll('.slot-available').forEach(s => s.classList.remove('bg-amber-800', 'text-white', 'border-amber-800'));
-                        el.classList.add('bg-amber-800', 'text-white', 'border-amber-800');
-                        selectedSlot = time24;
-                        document.getElementById('ui-selected-slot').innerText = format12h(time24);
-                        document.getElementById('selection-summary').classList.remove('hidden');
-                    };
-                    grid.appendChild(el);
+                    createSlot(time24, dayGrid);
                 });
             }
+
+            // Sesi Malam: 8.30 PM - 11.00 PM
+            const nightTimes = ['20:30', '21:00', '21:30', '22:00', '22:30'];
+            nightTimes.forEach(time24 => {
+                createSlot(time24, nightGrid);
+            });
         };
 
         window.selectQR = (provider) => {
@@ -461,10 +539,10 @@
         window.submitBooking = () => {
             const input = document.getElementById('receipt-input');
             const file = input ? input.files[0] : null;
-            if(!file) return showToast('Sila muat naik bukti bayaran!', '⚠️');
+            if(!file) return showToast('Sila muat naik bukti pembayaran!', '⚠️');
             
             const btn = document.getElementById('btn-submit');
-            btn.disabled = true; btn.innerText = "Hantar...";
+            btn.disabled = true; btn.innerText = "Sila Tunggu...";
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -481,7 +559,7 @@
                     packageName: packageName,
                     amount: payNow, 
                     totalPrice: totalCalculated,
-                    verified: true, // AUTO-VERIFIED
+                    verified: true,
                     balancePaid: false, 
                     receipt: e.target.result,
                     createdAt: new Date().toISOString()
@@ -493,7 +571,7 @@
                     showSuccessReceipt(currentBookingData);
                 } catch (err) {
                     showToast('Gagal menghantar tempahan', '❌');
-                    btn.disabled = false; btn.innerText = "HANTAR TEMPAHAN";
+                    btn.disabled = false; btn.innerText = "Hantar Tempahan";
                 }
             };
             reader.readAsDataURL(file);
@@ -519,7 +597,7 @@
             const dateStr = new Date(b.date).toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             const balance = (b.totalPrice - b.amount).toFixed(2);
             
-            const message = `🌟 *TEMPAHAN STUDIO RAYA 2026* 🌟%0A%0ANo Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Status:* Tempahan dihantar. Sila semak resit di WhatsApp ini. Terima kasih!`;
+            const message = `📸 *PENGESAHAN TEMPAHAN STUDIO RAYA*%0A%0AId Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Resit:* Bukti pembayaran telah dimuat naik ke dalam sistem. Sila semak. Terima kasih!`;
 
             window.open(`https://wa.me/601151929350?text=${message}`, '_blank');
         };
@@ -542,37 +620,40 @@
                 const balanceAtStudio = totalPrice - amountPaid;
                 const isBalancePaid = b.balancePaid || false;
                 
-                // Track finances (all are verified auto)
                 onlineTotal += amountPaid; 
                 if(isBalancePaid) balanceCollectedTotal += balanceAtStudio;
                 else balancePendingTotal += balanceAtStudio;
                 
                 const tr = document.createElement('tr');
-                tr.className = isBalancePaid ? 'bg-emerald-50/50 transition-colors' : 'transition-colors';
+                tr.className = isBalancePaid ? 'bg-emerald-50/40 transition-colors' : 'hover:bg-slate-50 transition-colors';
                 tr.innerHTML = `
-                    <td class="px-8 py-6 font-black">${format12h(b.slot)}</td>
-                    <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase font-bold">${b.phone}</span></td>
+                    <td class="px-8 py-6 font-black text-slate-800">${format12h(b.slot)}</td>
+                    <td class="px-8 py-6">
+                        <div class="font-bold text-slate-900">${b.name}</div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">${b.phone}</div>
+                    </td>
                     <td class="px-8 py-6 text-center">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-green-100 text-green-700">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-700">
                             Tempahan Sah
                         </span>
                     </td>
-                    <td class="px-8 py-6 text-center font-bold">RM ${amountPaid.toFixed(2)}</td>
-                    <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-600' : 'text-amber-800') : 'text-slate-300'}">
+                    <td class="px-8 py-6 text-center font-bold text-emerald-600">RM ${amountPaid.toFixed(2)}</td>
+                    <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-700' : 'text-amber-800') : 'text-slate-300'}">
                         ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
+                        ${isBalancePaid ? '<span class="block text-[8px] uppercase text-emerald-500 font-black mt-0.5 tracking-widest">(SELESAI)</span>' : ''}
                     </td>
                     <td class="px-8 py-6 text-right">
-                        <div class="flex items-center justify-end space-x-3">
-                            <label class="flex items-center space-x-1 cursor-pointer group">
-                                <span class="text-[9px] font-black text-slate-400 uppercase group-hover:text-emerald-600 transition-colors">Terima Baki?</span>
+                        <div class="flex items-center justify-end space-x-4">
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Terima Baki?</span>
                                 <input type="checkbox" ${isBalancePaid ? 'checked' : ''} 
                                        onchange="updateBalancePaidStatus('${b.id}', this.checked)"
                                        class="w-5 h-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
                             </label>
-                            <div class="h-6 w-px bg-slate-200 mx-2"></div>
-                            <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase hover:underline">Resit</button>
-                            <button onclick="removeBooking('${b.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <div class="h-6 w-px bg-slate-200"></div>
+                            <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase tracking-widest hover:underline">Resit</button>
+                            <button onclick="removeBooking('${b.id}')" class="text-red-400 hover:text-red-600 transition-all p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
                     </td>`;
@@ -588,24 +669,24 @@
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { balancePaid: status });
-                showToast(status ? 'Kutipan tunai direkodkan!' : 'Kutipan tunai dibatalkan');
+                showToast(status ? 'Kutipan baki tunai direkodkan!' : 'Rekod kutipan baki dipadam');
             } catch (err) { console.error(err); }
         };
 
         window.removeBooking = async (id) => {
-            if (window.confirm('Hapus rekod tempahan ini?')) {
+            if (window.confirm('Hapus rekod tempahan ini secara kekal?')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                     await deleteDoc(docRef);
-                    showToast('Rekod dipadam', '🗑️');
+                    showToast('Rekod berjaya dipadam', '🗑️');
                 } catch (err) { console.error(err); }
             }
         };
 
         window.openPaymentModal = () => {
             if(!document.getElementById('cust-name').value || !document.getElementById('cust-phone').value) 
-                return showToast('Sila lengkapkan maklumat!', '⚠️');
-            if(!selectedSlot) return showToast('Sila pilih slot masa!', '⚠️');
+                return showToast('Sila lengkapkan maklumat anda!', '⚠️');
+            if(!selectedSlot) return showToast('Sila pilih slot waktu dahulu!', '⚠️');
             document.getElementById('ui-modal-pay').innerText = `RM ${payNow.toFixed(2)}`;
             document.getElementById('payment-modal').classList.remove('hidden');
         };
@@ -619,12 +700,12 @@
             const btnAdmin = document.getElementById('nav-admin');
             
             if (v === 'admin') {
-                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg';
-                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+                btnAdmin.className = 'px-6 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg';
+                btnClient.className = 'px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
                 renderAdminDashboard();
             } else {
-                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg';
-                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+                btnClient.className = 'px-6 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg';
+                btnAdmin.className = 'px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
             }
         };
         
@@ -639,12 +720,12 @@
         window.verifyAdmin = () => {
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin(); switchView('admin');
-            } else showToast('Kata laluan salah!', '❌');
+            } else showToast('Kata laluan tidak sah!', '❌');
         };
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
-            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 12px;">`); }
-            else showToast('Tiada resit', 'ℹ️');
+            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)">`); }
+            else showToast('Tiada bukti bayaran dijumpai', 'ℹ️');
         };
 
         document.addEventListener('DOMContentLoaded', () => {
