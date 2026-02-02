@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Tempahan & Resit PDF</title>
+    <title>Studio Raya 2026 - Tempahan & Resit WhatsApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF Generation Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -19,12 +17,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-
-        /* Khusus untuk PDF supaya tulisan keluar */
-        #receipt-to-pdf {
-            background-color: white !important;
-            color: black !important;
-        }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900 overflow-x-hidden">
@@ -79,7 +71,7 @@
                     <h2 class="text-xl font-black mb-8 text-slate-800">Maklumat Tempahan</h2>
                     <div class="space-y-5">
                         <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all" placeholder="Nama Penuh">
-                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all" placeholder="No. WhatsApp">
+                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all" placeholder="No. WhatsApp (Cth: 0123456789)">
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -233,7 +225,7 @@
         </div>
     </div>
 
-    <!-- Modal Success & Receipt PDF -->
+    <!-- Modal Success & WhatsApp Sender -->
     <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0"></div>
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-110 p-8 space-y-6 animate-in fade-in zoom-in duration-300">
@@ -242,70 +234,67 @@
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <h2 class="text-2xl font-black text-slate-900">Tempahan Berjaya!</h2>
-                <p class="text-slate-500 text-sm">Sila simpan slip tempahan ini untuk rujukan semasa sesi.</p>
+                <p class="text-slate-500 text-sm">Hantar rujukan tempahan anda ke WhatsApp untuk rekod.</p>
             </div>
 
-            <!-- KANDUNGAN RESIT UNTUK PDF -->
-            <div class="bg-white border-2 border-slate-100 rounded-3xl overflow-hidden p-0">
-                <div id="receipt-to-pdf" class="p-10 space-y-8" style="width: 100%; background: white;">
-                    <div class="flex justify-between items-start border-b border-slate-100 pb-6">
+            <!-- Preview Slip -->
+            <div class="bg-white border-2 border-slate-100 rounded-3xl p-8 space-y-6">
+                <div class="flex justify-between items-start border-b border-slate-100 pb-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-amber-800 uppercase tracking-tighter leading-none">Studio Raya 2026</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">ID Rujukan</p>
+                        <p id="rcpt-ref" class="text-sm font-black text-slate-900">#RAYA-0000</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="space-y-4">
                         <div>
-                            <h3 class="text-2xl font-black text-amber-800 uppercase tracking-tighter leading-none">Studio Raya 2026</h3>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pelanggan</p>
+                            <p id="rcpt-name" class="font-bold text-slate-800 text-lg">-</p>
+                            <p id="rcpt-phone" class="text-xs text-slate-500 font-medium">-</p>
                         </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-slate-400 uppercase">ID Rujukan</p>
-                            <p id="rcpt-ref" class="text-sm font-black text-slate-900">#RAYA-0000</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pelanggan</p>
-                                <p id="rcpt-name" class="font-bold text-slate-800 text-lg">-</p>
-                                <p id="rcpt-phone" class="text-xs text-slate-500 font-medium">-</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pakej & Kapasiti</p>
-                                <p id="rcpt-pax" class="font-bold text-slate-800">-</p>
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Tarikh Janji Temu</p>
-                                <p id="rcpt-date" class="font-bold text-slate-800">-</p>
-                                <p id="rcpt-slot" class="text-lg font-black text-amber-800 uppercase">-</p>
-                            </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pakej & Kapasiti</p>
+                            <p id="rcpt-pax" class="font-bold text-slate-800">-</p>
                         </div>
                     </div>
-
-                    <div class="bg-slate-50 rounded-2xl p-6 space-y-3">
-                        <div class="flex justify-between text-xs font-bold">
-                            <span class="text-slate-400 uppercase tracking-widest">Amaun Deposit (Online)</span>
-                            <span id="rcpt-amount" class="text-slate-900 font-black">RM 0.00</span>
-                        </div>
-                        <div class="flex justify-between text-xs border-t border-slate-200 pt-3">
-                            <span class="text-amber-800 font-black uppercase tracking-widest">Baki Perlu Dibayar Di Studio</span>
-                            <span id="rcpt-balance" class="font-black text-amber-800 text-base underline decoration-2 underline-offset-4">RM 0.00</span>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Tarikh Janji Temu</p>
+                            <p id="rcpt-date" class="font-bold text-slate-800 text-sm">-</p>
+                            <p id="rcpt-slot" class="text-lg font-black text-amber-800 uppercase">-</p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="text-center pt-4 border-t border-slate-50">
-                        <p class="text-[9px] text-slate-300 font-bold uppercase leading-relaxed italic">
-                            ID Rujukan ini bukan pengesahan slot serta-merta.<br>Pihak studio akan menyemak resit anda dalam masa 24 jam.
-                        </p>
+                <div class="bg-slate-50 rounded-2xl p-6 space-y-3">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-400 uppercase tracking-widest">Amaun Dibayar</span>
+                        <span id="rcpt-amount" class="text-slate-900 font-black">RM 0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs border-t border-slate-200 pt-3">
+                        <span class="text-amber-800 font-black uppercase tracking-widest">Baki Di Studio</span>
+                        <span id="rcpt-balance" class="font-black text-amber-800 text-lg">RM 0.00</span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-                <button onclick="downloadReceiptPDF()" id="btn-download-pdf" class="flex-1 bg-slate-900 text-white py-5 rounded-2xl font-black shadow-xl flex items-center justify-center gap-3 hover:bg-black transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    MUAT TURUN PDF
-                </button>
-                <button onclick="location.reload()" class="sm:w-1/4 bg-slate-100 text-slate-500 py-5 rounded-2xl font-black hover:bg-slate-200 transition-all">
-                    TUTUP
+            <div class="flex flex-col gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onclick="sendToWhatsApp('customer')" class="bg-[#25D366] text-white py-4 rounded-2xl font-black shadow-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.903-6.16 2.544-1.64 1.641-2.543 3.841-2.543 6.162 0 1.611.433 3.191 1.245 4.578L3.394 24l4.695-1.231c1.332.727 2.83 1.111 4.35 1.111h.001c4.809 0 8.711-3.903 8.711-8.711 0-2.321-.904-4.521-2.545-6.162-1.641-1.641-3.841-2.544-6.162-2.544zM7.191 10.119c.148-.329.493-.541.83-.541.148 0 .294.032.423.088.13.056.242.144.331.258.113.144.186.314.214.492.027.177.011.359-.047.527l-.464 1.026c.307.399.664.756 1.063 1.063l1.026-.464c.168-.058.35-.074.527-.047.178.028.348.101.492.214.114.089.202.201.258.331.056.129.088.275.088.423 0 .337-.212.682-.541.83l-1.026.464c-.399-.307-.756-.664-1.063-1.063l.464-1.026c.058-.168.074-.35.047-.527a.64.64 0 00-.214-.492.65.65 0 00-.331-.258z"/></svg>
+                        HANTAR KE WHATSAPP SAYA
+                    </button>
+                    <button onclick="sendToWhatsApp('owner')" class="bg-slate-900 text-white py-4 rounded-2xl font-black shadow-xl flex items-center justify-center gap-2 hover:bg-black transition-all">
+                        HANTAR KE PEMILIK
+                    </button>
+                </div>
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all">
+                    SELESAI & TUTUP
                 </button>
             </div>
         </div>
@@ -347,11 +336,7 @@
         let payType = 'full';
         let totalCalculated = 0;
         let payNow = 0;
-
-        const qrMap = {
-            maybank: "https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg",
-            tngo: "https://i.postimg.cc/mP386yYm/tng-qr.jpg"
-        };
+        let currentBookingData = null; // Store for WhatsApp
 
         window.showToast = (msg, icon = '✅') => {
             const toast = document.getElementById('toast');
@@ -382,7 +367,7 @@
                     try {
                         await signInWithCustomToken(auth, __initial_auth_token);
                         signedIn = true;
-                    } catch (tokenErr) { console.warn("Fallback to anon."); }
+                    } catch (tokenErr) { console.warn("Fallback."); }
                 }
                 if (!signedIn) await signInAnonymously(auth);
 
@@ -508,7 +493,8 @@
                 try {
                     const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), bookingData);
                     showToast('Tempahan berjaya dihantar!');
-                    showSuccessReceipt(bookingData, docRef.id);
+                    currentBookingData = { ...bookingData, id: docRef.id };
+                    showSuccessReceipt(currentBookingData);
                 } catch (err) {
                     showToast('Gagal menghantar tempahan', '❌');
                     btn.disabled = false; btn.innerText = "SAHKAN & HANTAR TEMPAHAN";
@@ -517,9 +503,9 @@
             reader.readAsDataURL(file);
         };
 
-        window.showSuccessReceipt = (data, id) => {
+        window.showSuccessReceipt = (data) => {
             closePaymentModal();
-            document.getElementById('rcpt-ref').innerText = `#RAYA-${id.substring(0, 5).toUpperCase()}`;
+            document.getElementById('rcpt-ref').innerText = `#RAYA-${data.id.substring(0, 5).toUpperCase()}`;
             document.getElementById('rcpt-name').innerText = data.name;
             document.getElementById('rcpt-phone').innerText = data.phone;
             document.getElementById('rcpt-date').innerText = new Date(data.date).toLocaleDateString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -530,38 +516,24 @@
             document.getElementById('success-modal').classList.remove('hidden');
         };
 
-        window.downloadReceiptPDF = () => {
-            const element = document.getElementById('receipt-to-pdf');
-            const btn = document.getElementById('btn-download-pdf');
-            const name = document.getElementById('rcpt-name').innerText;
+        window.sendToWhatsApp = (type) => {
+            if(!currentBookingData) return;
             
-            btn.innerText = "Sedang Menjana...";
-            btn.disabled = true;
+            const b = currentBookingData;
+            const ref = b.id.substring(0, 5).toUpperCase();
+            const dateStr = new Date(b.date).toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const balance = (b.totalPrice - b.amount).toFixed(2);
+            
+            const message = `🌟 *TEMPAHAN STUDIO RAYA 2026* 🌟%0A%0ANo Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Nota:* Sila tunggu pengesahan resit daripada admin. Terima kasih!`;
 
-            const opt = {
-                margin: 0,
-                filename: `Slip-Studio-Raya-${name}.pdf`,
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { 
-                    scale: 3, 
-                    useCORS: true, 
-                    letterRendering: true,
-                    backgroundColor: "#FFFFFF" 
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            let phone = (type === 'owner') ? '601151929350' : b.phone;
+            
+            // Clean phone number (remove non-digits)
+            phone = phone.replace(/\D/g, '');
+            if(phone.startsWith('0')) phone = '6' + phone;
+            if(!phone.startsWith('60')) phone = '60' + phone;
 
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    btn.innerText = "MUAT TURUN PDF";
-                    btn.disabled = false;
-                    showToast("PDF berjaya dimuat turun!");
-                }).catch(err => {
-                    console.error("PDF Error:", err);
-                    btn.innerText = "MUAT TURUN PDF";
-                    btn.disabled = false;
-                });
-            }, 500);
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
         };
 
         window.renderAdminDashboard = () => {
@@ -601,7 +573,6 @@
                     <td class="px-8 py-6 text-center font-bold text-slate-700">RM ${amountPaid.toFixed(2)}</td>
                     <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-600' : 'text-amber-800') : 'text-slate-300'}">
                         ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
-                        ${isBalancePaid ? '<span class="block text-[8px] uppercase text-emerald-500 font-bold">(SETEL)</span>' : ''}
                     </td>
                     <td class="px-8 py-6 text-right">
                         <div class="flex items-center justify-end space-x-3">
@@ -614,7 +585,7 @@
                             </label>
                             <div class="h-6 w-px bg-slate-200 mx-2"></div>
                             <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase hover:underline">Resit</button>
-                            ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">Sahkan</button>` : ''}
+                            ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase hover:bg-black">Sahkan</button>` : ''}
                             <button onclick="removeBooking('${b.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
@@ -632,7 +603,7 @@
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { balancePaid: status });
-                showToast(status ? 'Kutipan tunai direkodkan!' : 'Kutipan tunai dibatalkan');
+                showToast(status ? 'Baki setel!' : 'Baki belum setel');
             } catch (err) { console.error(err); }
         };
 
