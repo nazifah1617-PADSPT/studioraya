@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Dashboard Pemilik Kemaskini</title>
+    <title>Studio Raya 2026 - Tempahan & Resit PDF</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -17,6 +19,9 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+        /* Receipt styling for PDF */
+        #receipt-content { background: white; padding: 40px; border: 1px solid #eee; }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900 overflow-x-hidden">
@@ -91,8 +96,8 @@
                         <div class="pt-4">
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block">Mod Bayaran</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900">BAYARAN PENUH</button>
-                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400">BOOKING (RM39)</button>
+                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all">BAYARAN PENUH</button>
+                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all">BOOKING (RM39)</button>
                             </div>
                         </div>
                     </div>
@@ -144,7 +149,6 @@
             </div>
         </div>
 
-        <!-- Statistik Dashboard -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                 <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Total Tempahan</p>
@@ -223,6 +227,82 @@
             </div>
 
             <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-xl hover:bg-amber-900 transition-all">SAHKAN & HANTAR TEMPAHAN</button>
+        </div>
+    </div>
+
+    <!-- Modal Success & Receipt PDF -->
+    <div id="success-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-10 p-8 space-y-6 animate-in fade-in zoom-in duration-300">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900">Tempahan Berjaya Dihantar!</h2>
+                <p class="text-slate-500 text-sm">Sila muat turun slip tempahan anda di bawah.</p>
+            </div>
+
+            <!-- Receipt Content (This will be PDF) -->
+            <div id="receipt-to-pdf" class="bg-white border-2 border-slate-100 rounded-3xl p-8 space-y-6">
+                <div class="flex justify-between items-start border-b pb-6">
+                    <div>
+                        <h3 class="text-xl font-black text-amber-800 uppercase tracking-tighter leading-none">Studio Raya 2026</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Sungai Bakap, Pulau Pinang</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">No. Rujukan</p>
+                        <p id="rcpt-ref" class="text-sm font-black text-slate-900">#RAYA-0000</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Pelanggan</p>
+                            <p id="rcpt-name" class="font-bold text-slate-800">-</p>
+                            <p id="rcpt-phone" class="text-xs text-slate-500">-</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Pakej & Pax</p>
+                            <p id="rcpt-pax" class="font-bold text-slate-800">-</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Tarikh & Masa</p>
+                            <p id="rcpt-date" class="font-bold text-slate-800">-</p>
+                            <p id="rcpt-slot" class="text-sm font-black text-amber-800 uppercase">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-6 space-y-2">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-500 font-bold uppercase">Dibayar (Online)</span>
+                        <span id="rcpt-amount" class="font-black text-slate-900">RM 0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs border-t border-slate-200 pt-2">
+                        <span class="text-amber-800 font-black uppercase">Baki Perlu Dibayar Di Studio</span>
+                        <span id="rcpt-balance" class="font-black text-amber-800 underline decoration-2 underline-offset-4">RM 0.00</span>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase leading-relaxed italic">
+                        Sila bawa slip ini semasa hari kejadian.<br>Slot anda akan disahkan oleh admin dalam masa terdekat.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="downloadReceiptPDF()" class="flex-1 bg-amber-800 text-white py-4 rounded-2xl font-black shadow-xl flex items-center justify-center gap-2 hover:bg-amber-900 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    MUAT TURUN SLIP (PDF)
+                </button>
+                <button onclick="location.reload()" class="sm:w-1/3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all">
+                    TUTUP
+                </button>
+            </div>
         </div>
     </div>
 
@@ -345,8 +425,8 @@
 
         window.setPaymentType = (type) => {
             payType = type;
-            document.getElementById('pay-type-full').className = type === 'full' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
-            document.getElementById('pay-type-booking').className = type === 'booking' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
+            document.getElementById('pay-type-full').className = type === 'full' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
+            document.getElementById('pay-type-booking').className = type === 'booking' ? 'p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all' : 'p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
             updateCalculations();
         };
 
@@ -402,7 +482,7 @@
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const data = {
+                const bookingData = {
                     name: document.getElementById('cust-name').value,
                     phone: document.getElementById('cust-phone').value,
                     date: document.getElementById('booking-date').value,
@@ -415,15 +495,49 @@
                     createdAt: new Date().toISOString()
                 };
                 try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), data);
+                    const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), bookingData);
                     showToast('Tempahan berjaya dihantar!');
-                    setTimeout(() => location.reload(), 1500);
+                    
+                    // Show success modal with data
+                    showSuccessReceipt(bookingData, docRef.id);
+                    
                 } catch (err) {
                     showToast('Gagal menghantar tempahan', '❌');
                     btn.disabled = false; btn.innerText = "SAHKAN & HANTAR TEMPAHAN";
                 }
             };
             reader.readAsDataURL(file);
+        };
+
+        window.showSuccessReceipt = (data, id) => {
+            // Close payment modal
+            closePaymentModal();
+            
+            // Populate success modal
+            document.getElementById('rcpt-ref').innerText = `#RAYA-${id.substring(0, 4).toUpperCase()}`;
+            document.getElementById('rcpt-name').innerText = data.name;
+            document.getElementById('rcpt-phone').innerText = data.phone;
+            document.getElementById('rcpt-date').innerText = new Date(data.date).toLocaleDateString('ms-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('rcpt-slot').innerText = format12h(data.slot);
+            document.getElementById('rcpt-pax').innerText = `${data.pax} Pax`;
+            document.getElementById('rcpt-amount').innerText = `RM ${data.amount.toFixed(2)}`;
+            document.getElementById('rcpt-balance').innerText = `RM ${(data.totalPrice - data.amount).toFixed(2)}`;
+            
+            // Show modal
+            document.getElementById('success-modal').classList.remove('hidden');
+        };
+
+        window.downloadReceiptPDF = () => {
+            const element = document.getElementById('receipt-to-pdf');
+            const name = document.getElementById('rcpt-name').innerText;
+            const opt = {
+                margin: 0.5,
+                filename: `Slip-Studio-Raya-${name}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         };
 
         window.renderAdminDashboard = () => {
@@ -446,24 +560,21 @@
                 
                 if(b.verified) { 
                     onlineTotal += amountPaid; 
-                    if(isBalancePaid) {
-                        balanceCollectedTotal += balanceAtStudio;
-                    } else {
-                        balancePendingTotal += balanceAtStudio;
-                    }
+                    if(isBalancePaid) balanceCollectedTotal += balanceAtStudio;
+                    else balancePendingTotal += balanceAtStudio;
                 }
                 
                 const tr = document.createElement('tr');
-                tr.className = isBalancePaid ? 'bg-emerald-50/50 transition-colors' : 'transition-colors';
+                tr.className = isBalancePaid ? 'bg-emerald-50/50' : '';
                 tr.innerHTML = `
                     <td class="px-8 py-6 font-black">${format12h(b.slot)}</td>
                     <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase font-bold">${b.phone}</span></td>
                     <td class="px-8 py-6 text-center">
                         <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700 animate-pulse'}">
-                            ${b.verified ? 'Deposit Sah' : 'Menunggu'}
+                            ${b.verified ? 'Sah' : 'Pending'}
                         </span>
                     </td>
-                    <td class="px-8 py-6 text-center font-bold">RM ${amountPaid.toFixed(2)}</td>
+                    <td class="px-8 py-6 text-center font-bold text-slate-700">RM ${amountPaid.toFixed(2)}</td>
                     <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-600' : 'text-amber-800') : 'text-slate-300'}">
                         ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
                         ${isBalancePaid ? '<span class="block text-[8px] uppercase text-emerald-500 font-bold">(SETEL)</span>' : ''}
@@ -479,15 +590,14 @@
                             </label>
                             <div class="h-6 w-px bg-slate-200 mx-2"></div>
                             <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase hover:underline">Resit</button>
-                            ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase hover:bg-black">Sahkan</button>` : ''}
-                            <button onclick="removeBooking('${b.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Padam">
+                            ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">Sahkan</button>` : ''}
+                            <button onclick="removeBooking('${b.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
                     </td>`;
                 body.appendChild(tr);
             });
-            
             document.getElementById('stat-total').innerText = filtered.length;
             document.getElementById('stat-online').innerText = `RM ${onlineTotal.toFixed(2)}`;
             document.getElementById('stat-balance-pending').innerText = `RM ${balancePendingTotal.toFixed(2)}`;
@@ -498,34 +608,25 @@
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { balancePaid: status });
-                showToast(status ? 'Kutipan tunai direkodkan!' : 'Kutipan tunai dibatalkan');
-            } catch (err) {
-                console.error(err);
-                showToast('Ralat mengemaskini data', '❌');
-            }
+                showToast(status ? 'Baki setel!' : 'Baki belum setel');
+            } catch (err) { console.error(err); }
         };
 
         window.confirmBooking = async (id) => {
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { verified: true });
-                showToast('Tempahan deposit disahkan');
-            } catch (err) {
-                console.error(err);
-                showToast('Gagal mengesahkan', '❌');
-            }
+                showToast('Tempahan disahkan');
+            } catch (err) { console.error(err); }
         };
 
         window.removeBooking = async (id) => {
-            if (window.confirm('Adakah anda pasti ingin memadam tempahan ini?')) {
+            if (window.confirm('Hapus tempahan ini?')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                     await deleteDoc(docRef);
-                    showToast('Rekod tempahan dipadam', '🗑️');
-                } catch (err) {
-                    console.error("Delete Error:", err);
-                    showToast('Ralat memadam data', '❌');
-                }
+                    showToast('Rekod dipadam', '🗑️');
+                } catch (err) { console.error(err); }
             }
         };
 
@@ -536,24 +637,11 @@
             document.getElementById('payment-modal').classList.remove('hidden');
         };
         window.closePaymentModal = () => document.getElementById('payment-modal')?.classList.add('hidden');
-        
         window.switchView = (v) => {
             document.getElementById('client-view')?.classList.toggle('hidden', v !== 'client');
             document.getElementById('admin-view')?.classList.toggle('hidden', v !== 'admin');
-            
-            const btnClient = document.getElementById('nav-client');
-            const btnAdmin = document.getElementById('nav-admin');
-            
-            if (v === 'admin') {
-                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg';
-                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
-                renderAdminDashboard();
-            } else {
-                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg';
-                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
-            }
+            if(v === 'admin') renderAdminDashboard();
         };
-        
         window.handleAdminAccess = () => {
             if (!document.getElementById('admin-view').classList.contains('hidden')) {
                 switchView('client');
@@ -561,19 +649,16 @@
                 document.getElementById('login-modal')?.classList.remove('hidden');
             }
         };
-        
         window.closeAdminLogin = () => document.getElementById('login-modal')?.classList.add('hidden');
-        
         window.verifyAdmin = () => {
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin(); switchView('admin');
-            } else showToast('Kata laluan salah!', '❌');
+            } else showToast('Salah!', '❌');
         };
-        
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
-            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 8px;">`); }
-            else showToast('Tiada resit dimuat naik', 'ℹ️');
+            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%">`); }
+            else showToast('Tiada resit', 'ℹ️');
         };
 
         document.addEventListener('DOMContentLoaded', () => {
