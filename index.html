@@ -91,8 +91,8 @@
                         <div class="pt-4">
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block">Mod Bayaran</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-amber-800 bg-amber-50 text-amber-900">BAYARAN PENUH</button>
-                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl transition-all border-slate-100 text-slate-400">BOOKING (RM39)</button>
+                                <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900">BAYARAN PENUH</button>
+                                <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400">BOOKING (RM39)</button>
                             </div>
                         </div>
                     </div>
@@ -149,11 +149,11 @@
                 <h3 id="stat-total" class="text-3xl font-black">0</h3>
             </div>
             <div class="bg-white p-8 rounded-[2rem] border border-slate-100">
-                <p class="text-[10px] font-black text-slate-400 uppercase">Kutipan Online</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase">Kutipan Online (Deposit/Penuh)</p>
                 <h3 id="stat-online" class="text-3xl font-black text-green-600">RM 0.00</h3>
             </div>
             <div class="bg-amber-50 p-8 rounded-[2rem] border border-amber-100">
-                <p class="text-[10px] font-black text-amber-600 uppercase">Baki Perlu Kutip</p>
+                <p class="text-[10px] font-black text-amber-600 uppercase">Jumlah Baki Perlu Dikutip</p>
                 <h3 id="stat-balance" class="text-3xl font-black text-amber-800">RM 0.00</h3>
             </div>
         </div>
@@ -166,7 +166,8 @@
                             <th class="px-8 py-6">Masa</th>
                             <th class="px-8 py-6">Pelanggan</th>
                             <th class="px-8 py-6 text-center">Status</th>
-                            <th class="px-8 py-6 text-center">Dibayar</th>
+                            <th class="px-8 py-6 text-center">Dibayar (Online)</th>
+                            <th class="px-8 py-6 text-center text-amber-700">Baki (Di Studio)</th>
                             <th class="px-8 py-6 text-right">Tindakan</th>
                         </tr>
                     </thead>
@@ -423,16 +424,29 @@
             const fDate = dateEl.value;
             const filtered = bookings.filter(b => b.date === fDate).sort((a,b) => a.slot.localeCompare(b.slot));
             body.innerHTML = '';
-            let online = 0, balance = 0;
+            
+            let onlineTotal = 0;
+            let balanceTotal = 0;
+            
             filtered.forEach(b => {
-                const bAmt = (b.totalPrice || 0) - (b.amount || 0);
-                if(b.verified) { online += (b.amount || 0); balance += bAmt; }
+                const amountPaid = b.amount || 0;
+                const totalPrice = b.totalPrice || amountPaid;
+                const balanceAtStudio = totalPrice - amountPaid;
+                
+                if(b.verified) { 
+                    onlineTotal += amountPaid; 
+                    balanceTotal += balanceAtStudio; 
+                }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="px-8 py-6 font-black">${format12h(b.slot)}</td>
                     <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase">${b.phone}</span></td>
                     <td class="px-8 py-6 text-center"><span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${b.verified ? 'Sah' : 'Pending'}</span></td>
-                    <td class="px-8 py-6 text-center font-bold">RM ${(b.amount || 0).toFixed(2)}</td>
+                    <td class="px-8 py-6 text-center font-bold">RM ${amountPaid.toFixed(2)}</td>
+                    <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? 'text-amber-800' : 'text-slate-300'}">
+                        ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
+                    </td>
                     <td class="px-8 py-6 text-right space-x-2">
                         <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase">Resit</button>
                         ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[9px] uppercase">Sahkan</button>` : ''}
@@ -441,8 +455,8 @@
                 body.appendChild(tr);
             });
             document.getElementById('stat-total').innerText = filtered.length;
-            document.getElementById('stat-online').innerText = `RM ${online.toFixed(2)}`;
-            document.getElementById('stat-balance').innerText = `RM ${balance.toFixed(2)}`;
+            document.getElementById('stat-online').innerText = `RM ${onlineTotal.toFixed(2)}`;
+            document.getElementById('stat-balance').innerText = `RM ${balanceTotal.toFixed(2)}`;
         };
 
         window.confirmBooking = async (id) => {
@@ -457,8 +471,7 @@
         };
 
         window.removeBooking = async (id) => {
-            // Kita gunakan prompt sederhana atau langsung hapus karena confirm() sering bermasalah di iframe
-            const logicHapus = async () => {
+            if (window.confirm('Adakah anda pasti ingin memadam tempahan ini?')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                     await deleteDoc(docRef);
@@ -467,11 +480,6 @@
                     console.error("Delete Error:", err);
                     showToast('Ralat memadam data', '❌');
                 }
-            };
-            
-            // Gunakan konfirmasi browser standar, jika gagal di iframe, kita tambahkan penanganan
-            if (window.confirm('Adakah anda pasti ingin memadam tempahan ini?')) {
-                await logicHapus();
             }
         };
 
