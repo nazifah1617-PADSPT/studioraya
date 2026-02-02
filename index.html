@@ -3,202 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Gambar - Sistem Booking & Firebase</title>
+    <title>Studio Raya 2026 - Booking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .slot-booked { background-color: #fee2e2; border-color: #fca5a5; color: #991b1b; cursor: not-allowed; opacity: 0.6; }
-        .slot-available { cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #f1f5f9; background: white; }
-        .slot-available:hover { transform: translateY(-2px); box-shadow: 0 4px 12px -1px rgb(0 0 0 / 0.1); border-color: #92400e; }
+        .slot-available { cursor: pointer; transition: all 0.2s; border: 2px solid #f1f5f9; background: white; }
+        .slot-available:hover { border-color: #92400e; background-color: #fffbeb; }
         .modal-overlay { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); }
         .qr-selected { border-color: #92400e !important; background-color: #fffbeb !important; }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900">
 
-    <!-- Alert Box for Errors -->
-    <div id="error-notice" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md p-4 bg-red-600 text-white rounded-2xl shadow-2xl font-bold text-center animate-bounce">
-        <p id="error-msg">Ralat dikesan!</p>
+    <!-- Error Notice -->
+    <div id="error-notice" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md p-4 bg-red-600 text-white rounded-2xl shadow-2xl font-bold text-center">
+        <p id="error-msg">Ralat!</p>
     </div>
 
     <!-- Navigation -->
     <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-amber-800 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-amber-900/20">S</div>
-                    <div>
-                        <span class="text-xl font-bold text-slate-800 tracking-tight block leading-none">Studio Raya <span class="text-amber-800 font-black">2026</span></span>
-                        <span class="text-[10px] text-slate-400 font-medium">Sungai Bakap, Pulau Pinang</span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="window.switchTab('client')" id="btn-client" class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all bg-amber-800 text-white shadow-md">Tempahan</button>
-                    <button onclick="window.checkAdminPassword()" id="btn-admin" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all">Owner</button>
-                </div>
+        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-amber-800 rounded-xl flex items-center justify-center text-white font-bold">S</div>
+                <span class="text-xl font-bold">Studio Raya <span class="text-amber-800">2026</span></span>
             </div>
+            <div id="auth-status" class="text-[10px] font-bold text-amber-600 animate-pulse bg-amber-50 px-3 py-1 rounded-full uppercase">Menghubungkan...</div>
         </div>
     </nav>
 
-    <!-- Client View -->
-    <main id="client-view" class="max-w-6xl mx-auto px-4 py-12">
-        <div class="max-w-3xl mx-auto text-center mb-16">
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Pakej Mini Studio Raya</h1>
-            <p class="text-slate-500 text-lg">Sila isi maklumat dan pilih slot anda.</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Form Section -->
+    <main id="client-view" class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Form -->
             <div class="lg:col-span-5 space-y-6">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <h2 class="text-xl font-bold mb-6 text-slate-800">Maklumat Tempahan</h2>
-                    <div class="space-y-5">
-                        <input type="text" id="cust-name" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border outline-none focus:border-amber-500" placeholder="Nama Penuh">
-                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border outline-none focus:border-amber-500" placeholder="No. WhatsApp">
-                        
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Pilihan Pakej</label>
-                            <select id="package-select" onchange="window.calculateTotal()" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border outline-none font-bold">
-                                <option value="89">Sebelum Puasa - RM89</option>
-                                <option value="99">Bulan Puasa - RM99</option>
-                                <option value="150">Raya Pertama - RM150</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Jumlah Pax</label>
-                            <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="window.calculateTotal()" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold">
-                        </div>
-
-                        <div class="pt-2">
-                            <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Mod Pembayaran</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="window.setPaymentType('full')" id="type-full" class="p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900">Bayaran Penuh</button>
-                                <button onclick="window.setPaymentType('booking')" id="type-booking" class="p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400">Booking Slot (RM39)</button>
-                            </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                    <h2 class="text-lg font-bold mb-4">Maklumat Anda</h2>
+                    <div class="space-y-4">
+                        <input type="text" id="cust-name" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border outline-none focus:border-amber-500" placeholder="Nama">
+                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border outline-none focus:border-amber-500" placeholder="WhatsApp">
+                        <select id="package-select" onchange="window.calculateTotal()" class="w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold">
+                            <option value="89">Sebelum Puasa - RM89</option>
+                            <option value="99">Bulan Puasa - RM99</option>
+                            <option value="150">Raya Pertama - RM150</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.setPaymentType('full')" id="type-full" class="p-3 text-xs font-bold border-2 rounded-xl border-amber-800 bg-amber-50">Bayaran Penuh</button>
+                            <button onclick="window.setPaymentType('booking')" id="type-booking" class="p-3 text-xs font-bold border-2 rounded-xl border-slate-100 text-slate-400">Booking (RM39)</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 p-8 rounded-3xl text-white shadow-2xl">
-                    <p class="text-xs uppercase font-bold text-slate-400 mb-2">Jumlah Bayaran Sekarang</p>
-                    <h3 id="display-total-pay" class="text-4xl font-black">RM 89.00</h3>
-                    <p id="display-balance-text" class="text-[10px] text-slate-400 mt-1 hidden font-bold tracking-widest">BAKI PERLU DIBAYAR DI STUDIO</p>
+                <div class="bg-slate-900 p-6 rounded-3xl text-white">
+                    <p class="text-[10px] uppercase font-bold text-slate-400">Bayaran Sekarang</p>
+                    <h3 id="display-total-pay" class="text-3xl font-black">RM 89.00</h3>
                 </div>
             </div>
 
-            <!-- Slots Section -->
+            <!-- Slots -->
             <div class="lg:col-span-7">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                        <h2 class="text-xl font-bold text-slate-800">Pilih Tarikh & Slot</h2>
-                        <input type="date" id="booking-date" onchange="window.renderSlots()" class="bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold">
-                    </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                    <input type="date" id="booking-date" onchange="window.renderSlots()" class="mb-6 w-full bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold">
+                    <div id="slots-container" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
                     
-                    <div id="slots-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3 min-h-[300px]">
-                        <p class="col-span-full text-center text-slate-400 py-10">Sila pilih tarikh.</p>
-                    </div>
-                    
-                    <div id="selected-info" class="hidden mt-8 p-6 bg-amber-50 border border-amber-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <p class="text-xs text-amber-700 font-bold uppercase">Slot Dipilih</p>
-                            <p class="text-2xl font-black text-amber-900" id="display-slot">--:--</p>
-                        </div>
-                        <button onclick="window.openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-10 py-4 rounded-2xl font-bold shadow-xl">Teruskan Bayaran</button>
+                    <div id="selected-info" class="hidden mt-6 p-4 bg-amber-50 rounded-2xl flex justify-between items-center">
+                        <p class="text-xl font-black text-amber-900" id="display-slot">--:--</p>
+                        <button onclick="window.openPaymentModal()" class="bg-amber-800 text-white px-6 py-3 rounded-xl font-bold">Bayar Sekarang</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-
-    <!-- Admin View -->
-    <main id="admin-view" class="max-w-7xl mx-auto px-4 py-12 hidden">
-        <h1 class="text-3xl font-black mb-8">Dashboard Owner</h1>
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
-                    <tr>
-                        <th class="px-8 py-6">Slot</th>
-                        <th class="px-8 py-6">Pelanggan</th>
-                        <th class="px-8 py-6 text-center">Status</th>
-                        <th class="px-8 py-6 text-right">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-list-body"></tbody>
-            </table>
         </div>
     </main>
 
     <!-- Payment Modal -->
     <div id="payment-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0" onclick="window.closePaymentModal()"></div>
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg relative z-10 p-8 space-y-6">
-            <h3 class="text-2xl font-black">Sahkan Bayaran</h3>
-            <div class="text-center bg-amber-50 p-6 rounded-2xl">
-                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Jumlah Bayaran</p>
-                <p id="qr-pay-amount" class="text-4xl font-black text-amber-800">RM 0.00</p>
+        <div class="bg-white rounded-[2rem] w-full max-w-md relative z-10 p-8 text-center">
+            <h3 class="text-xl font-black mb-4">Sahkan Pembayaran</h3>
+            <p id="qr-pay-amount" class="text-3xl font-black text-amber-800 mb-6">RM 0.00</p>
+            
+            <div class="flex gap-2 mb-4">
+                <button onclick="window.selectQR('maybank')" id="btn-qr-maybank" class="flex-1 p-3 border-2 rounded-xl qr-selected font-bold text-xs">MAYBANK</button>
+                <button onclick="window.selectQR('tngo')" id="btn-qr-tngo" class="flex-1 p-3 border-2 border-slate-100 rounded-xl font-bold text-xs">TNG eWallet</button>
             </div>
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="window.selectQR('maybank')" id="btn-qr-maybank" class="flex flex-col items-center gap-2 p-4 border-2 rounded-2xl transition-all qr-selected">
-                        <span class="text-sm font-bold">MAE / MAYBANK</span>
-                    </button>
-                    <button onclick="window.selectQR('tngo')" id="btn-qr-tngo" class="flex flex-col items-center gap-2 p-4 border-2 border-slate-100 rounded-2xl transition-all">
-                        <span class="text-sm font-bold">TOUCH 'N GO</span>
-                    </button>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-3xl border border-slate-200 flex flex-col items-center">
-                    <img id="qr-display-img" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-48 h-48 object-contain rounded-xl shadow-md mb-3">
-                    <p class="text-[10px] text-slate-400 font-bold">Imbas & Lampirkan Resit</p>
-                </div>
-                <input type="file" id="receipt-upload" accept="image/*" class="w-full text-sm">
-            </div>
-            <button onclick="window.confirmBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-2xl font-black shadow-xl">Hantar Tempahan</button>
-        </div>
-    </div>
 
-    <!-- Admin Password -->
-    <div id="admin-login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-        <div class="modal-overlay absolute inset-0" onclick="window.closeAdminLogin()"></div>
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-xs relative z-10 p-10 text-center">
-            <h3 class="text-xl font-black mb-6">Akses Owner</h3>
-            <input type="password" id="admin-pass" class="w-full border rounded-xl p-4 text-center mb-6 font-bold" placeholder="Kata Laluan">
-            <button onclick="window.validateAdmin()" class="w-full py-4 bg-amber-800 text-white rounded-xl font-bold">Masuk</button>
+            <img id="qr-display-img" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-40 h-40 mx-auto mb-4 object-contain">
+            
+            <input type="file" id="receipt-upload" accept="image/*" class="w-full text-xs mb-6">
+            
+            <button onclick="window.confirmBooking()" id="btn-submit" class="w-full py-4 bg-amber-800 text-white rounded-xl font-bold">Hantar Bukti Bayaran</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- KONFIGURASI FIREBASE ---
-        // Sila pastikan __firebase_config ada atau ganti dengan objek config anda sendiri
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSy...", // Masukkan API Key anda jika run di luar environment ini
-            projectId: "studio-raya-2026",
-            // ... maklumat lain
-        };
-
-        let app, db, auth;
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-        } catch (e) {
-            showError("Konfigurasi Firebase Tidak Sah: " + e.message);
-        }
-
+        // Global State
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'studio-raya-2026';
+        let db, auth, currentUser = null;
         let allBookings = [];
-        let currentUser = null;
-        let selectedDate = new Date().toISOString().split('T')[0];
         let selectedSlot = null;
         let paymentType = 'full';
         let totalFullPrice = 89;
         let payNow = 89;
-        let unsubscribe = null;
+
+        // Initialization
+        async function init() {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // RULE 3: Auth first
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        document.getElementById('auth-status').innerText = "Sedia";
+                        document.getElementById('auth-status').classList.remove('animate-pulse');
+                        document.getElementById('auth-status').classList.replace('text-amber-600', 'text-green-600');
+                        startListener();
+                    }
+                });
+            } catch (e) {
+                showError("Koneksi Gagal: " + e.message);
+            }
+        }
+
+        function startListener() {
+            // RULE 1: Path Structure
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
+            onSnapshot(q, (snapshot) => {
+                allBookings = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                window.renderSlots();
+            }, (err) => showError("Sila kemas kini Firestore Rules anda."));
+        }
 
         function showError(msg) {
             const el = document.getElementById('error-notice');
@@ -207,79 +154,52 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
-        // DEDAHKAN FUNGSI KE WINDOW (Supaya HTML onclick boleh panggil)
-        window.switchTab = (view) => {
-            document.getElementById('client-view').classList.toggle('hidden', view !== 'client');
-            document.getElementById('admin-view').classList.toggle('hidden', view !== 'admin');
-        };
-
-        window.checkAdminPassword = () => document.getElementById('admin-login-modal').classList.remove('hidden');
-        window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.add('hidden');
-        window.validateAdmin = () => {
-            if(document.getElementById('admin-pass').value === 'iqmal271') {
-                window.closeAdminLogin();
-                window.switchTab('admin');
-            } else alert('Salah!');
-        };
-
+        // Global Functions
         window.calculateTotal = () => {
-            const base = parseInt(document.getElementById('package-select').value) || 0;
-            const pax = parseInt(document.getElementById('extra-pax').value) || 1;
-            let extra = pax > 6 ? (pax - 6) * 5 : 0;
-            totalFullPrice = base + extra;
+            const base = parseInt(document.getElementById('package-select').value);
+            totalFullPrice = base;
             payNow = paymentType === 'full' ? totalFullPrice : 39;
-            
             document.getElementById('display-total-pay').innerText = `RM ${payNow.toFixed(2)}`;
-            const bal = totalFullPrice - payNow;
-            const balEl = document.getElementById('display-balance-text');
-            if(bal > 0) {
-                balEl.innerText = `BAKI RM ${bal.toFixed(2)} PERLU DIBAYAR DI STUDIO`;
-                balEl.classList.remove('hidden');
-            } else balEl.classList.add('hidden');
         };
 
         window.setPaymentType = (type) => {
             paymentType = type;
-            document.getElementById('type-full').className = type === 'full' ? 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400';
-            document.getElementById('type-booking').className = type === 'booking' ? 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900' : 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400';
+            document.getElementById('type-full').className = type === 'full' ? 'p-3 text-xs font-bold border-2 rounded-xl border-amber-800 bg-amber-50' : 'p-3 text-xs font-bold border-2 rounded-xl border-slate-100 text-slate-400';
+            document.getElementById('type-booking').className = type === 'booking' ? 'p-3 text-xs font-bold border-2 rounded-xl border-amber-800 bg-amber-50' : 'p-3 text-xs font-bold border-2 rounded-xl border-slate-100 text-slate-400';
             window.calculateTotal();
         };
 
         window.renderSlots = () => {
             const date = document.getElementById('booking-date').value;
             const container = document.getElementById('slots-container');
-            container.innerHTML = '';
+            if(!date) return container.innerHTML = '<p class="col-span-full text-center py-10 text-slate-400">Pilih tarikh</p>';
             
+            container.innerHTML = '';
             const booked = allBookings.filter(b => b.date === date && b.verified).map(b => b.slot);
 
-            for(let h=9; h<22; h++) {
+            for(let h=10; h<22; h++) {
                 if(h === 19 || h === 20) continue;
-                [0, 30].forEach(m => {
-                    const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                ['00', '30'].forEach(m => {
+                    const time = `${h}:${m}`;
                     const isBooked = booked.includes(time);
-                    const div = document.createElement('div');
-                    div.className = `p-4 text-center rounded-2xl text-xs font-bold transition-all ${isBooked ? 'slot-booked' : 'slot-available'}`;
-                    div.innerText = time;
+                    const btn = document.createElement('button');
+                    btn.className = `p-3 text-sm font-bold rounded-xl border ${isBooked ? 'slot-booked' : 'slot-available'}`;
+                    btn.innerText = time;
                     if(!isBooked) {
-                        div.onclick = () => {
-                            document.querySelectorAll('.slot-available').forEach(e => e.classList.remove('bg-amber-800', 'text-white'));
-                            div.classList.add('bg-amber-800', 'text-white');
+                        btn.onclick = () => {
                             selectedSlot = time;
+                            document.querySelectorAll('.slot-available').forEach(el => el.classList.remove('bg-amber-800', 'text-white'));
+                            btn.classList.add('bg-amber-800', 'text-white');
                             document.getElementById('display-slot').innerText = time;
                             document.getElementById('selected-info').classList.remove('hidden');
                         };
                     }
-                    container.appendChild(div);
+                    container.appendChild(btn);
                 });
             }
         };
 
-        window.openPaymentModal = () => {
-            if(!document.getElementById('cust-name').value) return alert('Nama wajib diisi');
-            document.getElementById('qr-pay-amount').innerText = `RM ${payNow.toFixed(2)}`;
-            document.getElementById('payment-modal').classList.remove('hidden');
-        };
-
+        window.openPaymentModal = () => document.getElementById('payment-modal').classList.remove('hidden');
         window.closePaymentModal = () => document.getElementById('payment-modal').classList.add('hidden');
 
         window.selectQR = (p) => {
@@ -289,86 +209,47 @@
         };
 
         window.confirmBooking = async () => {
+            if (!currentUser) return showError("Sila tunggu sehingga sistem sedia (Auth).");
+            const name = document.getElementById('cust-name').value;
             const file = document.getElementById('receipt-upload').files[0];
-            if(!file) return alert('Sila muat naik resit');
             
+            if(!name || !file) return alert('Nama & Resit diperlukan');
+
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "Sila Tunggu...";
             btn.disabled = true;
+            btn.innerText = "Menghantar...";
 
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const data = {
-                    name: document.getElementById('cust-name').value,
+                    name,
                     phone: document.getElementById('cust-phone').value,
                     date: document.getElementById('booking-date').value,
                     slot: selectedSlot,
                     amount: payNow,
-                    totalPrice: totalFullPrice,
                     verified: false,
                     receipt: e.target.result,
-                    userId: currentUser.uid
+                    userId: currentUser.uid, // SEKARANG DIJAMIN ADA
+                    createdAt: new Date().toISOString()
                 };
+
                 try {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), data);
-                    alert('Tempahan dihantar! Tunggu pengesahan owner.');
+                    alert('Berjaya! Sila tunggu owner sahkan.');
                     location.reload();
                 } catch (err) {
-                    showError("Firestore Error: " + err.message);
+                    showError("Gagal simpan: " + err.message);
                     btn.disabled = false;
-                    btn.innerText = "Hantar Tempahan";
+                    btn.innerText = "Hantar Bukti Bayaran";
                 }
             };
             reader.readAsDataURL(file);
         };
 
-        // INITIALIZE AUTH & DATA
-        const start = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUser = user;
-                        const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
-                        onSnapshot(colRef, (s) => {
-                            allBookings = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                            window.renderSlots();
-                            renderAdmin();
-                        }, (err) => showError("Permission Denied: Sila semak Firestore Rules."));
-                    }
-                });
-            } catch (err) {
-                showError("Auth Error: " + err.message);
-            }
-        };
-
-        function renderAdmin() {
-            const body = document.getElementById('admin-list-body');
-            body.innerHTML = '';
-            allBookings.forEach(b => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-8 py-6 font-bold">${b.date} | ${b.slot}</td>
-                    <td class="px-8 py-6">${b.name}</td>
-                    <td class="px-8 py-6 text-center">${b.verified ? 'SAH' : 'PENDING'}</td>
-                    <td class="px-8 py-6 text-right"><button onclick="window.approve('${b.id}')" class="bg-black text-white px-4 py-2 rounded-lg text-xs">Sahkan</button></td>
-                `;
-                body.appendChild(tr);
-            });
-        }
-
-        window.approve = async (id) => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { verified: true });
-        };
-
         window.onload = () => {
-            document.getElementById('booking-date').value = selectedDate;
-            start();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-date').value = today;
+            init();
         };
     </script>
 </body>
