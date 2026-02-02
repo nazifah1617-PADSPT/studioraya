@@ -91,7 +91,7 @@
                     <div class="relative z-10">
                         <p class="text-xs uppercase font-bold text-slate-400 mb-2">Jumlah Bayaran Sekarang</p>
                         <h3 id="display-total-pay" class="text-4xl font-black">RM 89.00</h3>
-                        <p id="display-balance-text" class="text-[10px] text-slate-400 mt-1 hidden font-bold tracking-widest">BAKI RM 0.00 PERLU DIBAYAR DI STUDIO</p>
+                        <p id="display-balance-text" class="text-[10px] text-slate-400 mt-1 hidden font-bold tracking-widest uppercase">BAKI PERLU DIBAYAR DI STUDIO</p>
                     </div>
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full"></div>
                 </div>
@@ -105,7 +105,9 @@
                         <input type="date" id="booking-date" onchange="renderSlots()" class="bg-slate-50 border-slate-200 rounded-xl p-3 border font-bold outline-none focus:border-amber-500">
                     </div>
                     
-                    <div id="slots-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                    <div id="slots-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <p class="col-span-full text-center text-slate-400 py-10 animate-pulse">Memuatkan slot...</p>
+                    </div>
                     
                     <div id="selected-info" class="hidden mt-10 p-6 bg-amber-50 border border-amber-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div>
@@ -137,35 +139,22 @@
             </div>
         </div>
 
-        <!-- Statistics Panel -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Tempahan (Hari Ini)</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Tempahan</p>
                 <h3 id="stat-total-bookings" class="text-2xl font-black text-slate-900">0</h3>
             </div>
             <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dah Terima Online (Hari Ini)</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Terimaan Online</p>
                 <h3 id="stat-paid-amount" class="text-2xl font-black text-green-600">RM 0.00</h3>
             </div>
             <div class="bg-amber-50 p-6 rounded-[2rem] border border-amber-200 shadow-sm">
-                <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Kutipan Baki Sesi (Hari Ini)</p>
+                <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Baki Perlu Kutip</p>
                 <h3 id="stat-balance-collection" class="text-2xl font-black text-amber-800">RM 0.00</h3>
-                <p class="text-[9px] text-amber-600 font-bold mt-1 uppercase italic">* Jumlah perlu dikutip dari pelanggan di studio</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sahkan Slip Pending</p>
-                <h3 id="stat-pending-amount" class="text-2xl font-black text-slate-400">RM 0.00</h3>
-            </div>
-            <div class="bg-slate-900 p-6 rounded-[2rem] shadow-lg">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Slot Aktif Seterusnya</p>
-                <h3 id="stat-next-slot" class="text-2xl font-black text-white">--:--</h3>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mt-6">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b">
@@ -173,8 +162,7 @@
                             <th class="px-8 py-6">Slot</th>
                             <th class="px-8 py-6">Pelanggan</th>
                             <th class="px-8 py-6 text-center">Status</th>
-                            <th class="px-8 py-6 text-center">Dibayar</th>
-                            <th class="px-8 py-6 text-center">Baki di Studio</th>
+                            <th class="px-8 py-6 text-center">Baki</th>
                             <th class="px-8 py-6 text-right">Tindakan</th>
                         </tr>
                     </thead>
@@ -204,35 +192,34 @@
                 <p class="text-xs font-bold text-slate-500 uppercase text-center tracking-widest">Pilih Kaedah Imbasan QR</p>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="selectQR('maybank')" id="btn-qr-maybank" class="flex flex-col items-center gap-2 p-3 border-2 rounded-2xl transition-all qr-selected">
-                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-6 object-contain grayscale-0" alt="Maybank" onerror="this.src='https://placehold.co/100x40?text=MAYBANK'">
+                        <img src="https://i.postimg.cc/mD3mX6sM/maybank-logo.png" class="h-6 object-contain" alt="Maybank">
                         <span class="text-[10px] font-black uppercase">Maybank MAE</span>
                     </button>
                     <button onclick="selectQR('tngo')" id="btn-qr-tngo" class="flex flex-col items-center gap-2 p-3 border-2 rounded-2xl border-slate-100 transition-all">
-                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-6 object-contain grayscale" alt="TNG" onerror="this.src='https://placehold.co/100x40?text=TNG'">
+                        <img src="https://i.postimg.cc/mD8T1L4C/tng-logo.png" class="h-6 object-contain grayscale" alt="TNG">
                         <span class="text-[10px] font-black uppercase">Touch 'n Go</span>
                     </button>
                 </div>
 
                 <div class="bg-slate-50 p-4 rounded-3xl border border-slate-200 flex flex-col items-center">
                     <img id="qr-display-img" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-48 h-48 object-contain rounded-xl shadow-inner mb-3" alt="Scan QR">
-                    <p class="text-[10px] text-slate-400 font-bold text-center">Imbas kod di atas menggunakan aplikasi bank anda</p>
+                    <p class="text-[10px] text-slate-400 font-bold text-center">Imbas kod di atas untuk bayaran</p>
                 </div>
             </div>
 
             <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">Muat Naik Resit (Screenshot)</label>
-                <div class="relative">
-                    <input type="file" id="receipt-upload" accept="image/*" class="w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer">
-                </div>
+                <input type="file" id="receipt-upload" accept="image/*" class="w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200">
             </div>
 
-            <button onclick="confirmBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all transform active:scale-[0.98]">Selesaikan Tempahan</button>
+            <button onclick="confirmBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all">Selesaikan Tempahan</button>
         </div>
     </div>
 
+    <!-- Admin Login -->
     <div id="admin-login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0" onclick="closeAdminLogin()"></div>
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-sm relative z-10 p-10 text-center">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-xs relative z-10 p-10 text-center">
             <h3 class="text-xl font-black mb-6">Akses Owner</h3>
             <input type="password" id="admin-pass" class="w-full border rounded-xl p-4 text-center mb-6 font-bold bg-slate-50 outline-none focus:border-amber-500" placeholder="Kata Laluan">
             <button onclick="validateAdmin()" class="w-full py-4 bg-amber-800 text-white rounded-xl font-bold">Masuk</button>
@@ -244,7 +231,16 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // CONFIG UTAMA
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "", 
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -264,56 +260,87 @@
             tngo: "https://i.postimg.cc/mP386yYm/tng-qr.jpg"
         };
 
-        const initApp = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUser = user;
-                        setupRealtimeListener();
-                    }
-                });
-                document.getElementById('booking-date').value = selectedDate;
-                document.getElementById('admin-date-filter').value = selectedDate;
-                calculateTotal();
-            } catch (err) { console.error(err); }
-        };
-
-        const setupRealtimeListener = () => {
-            if (!currentUser) return;
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
-            unsubscribe = onSnapshot(colRef, (snapshot) => {
-                allBookings = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderSlots();
-                renderAdminList();
-            }, (error) => {
-                console.error("Firestore Error:", error);
-            });
-        };
-
-        // Helper to convert 24h to 12h AM/PM
         const formatTime12h = (time24) => {
             const [hours, minutes] = time24.split(':');
             let h = parseInt(hours);
             const ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12;
-            h = h ? h : 12; // 0 becomes 12
+            h = h ? h : 12;
             return `${h.toString().padStart(2, '0')}:${minutes} ${ampm}`;
         };
 
+        const initApp = async () => {
+            console.log("App Initializing...");
+            try {
+                // RULE 3: Auth Before Queries
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    console.log("Using custom token...");
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    console.log("Using anonymous auth...");
+                    await signInAnonymously(auth);
+                }
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log("Authenticated as UID:", user.uid);
+                        currentUser = user;
+                        setupRealtimeListener();
+                    } else {
+                        console.error("No user found after auth attempt.");
+                    }
+                });
+
+                document.getElementById('booking-date').value = selectedDate;
+                document.getElementById('admin-date-filter').value = selectedDate;
+                calculateTotal();
+            } catch (err) {
+                console.error("CRITICAL AUTH ERROR:", err.message);
+            }
+        };
+
+        const setupRealtimeListener = () => {
+            if (!currentUser) {
+                console.warn("Skipping Firestore listener: No Auth User.");
+                return;
+            }
+            
+            // RULE 1: Path yang sangat spesifik
+            const colPath = `artifacts/${appId}/public/data/bookings`;
+            console.log("Listening to path:", colPath);
+            
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
+            
+            if (unsubscribe) unsubscribe();
+            
+            unsubscribe = onSnapshot(colRef, (snapshot) => {
+                console.log(`Data received. Count: ${snapshot.docs.length}`);
+                allBookings = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderSlots();
+                renderAdminList();
+            }, (error) => {
+                console.error("FIRESTORE PERMISSION ERROR:", error.code, error.message);
+                if(error.code === 'permission-denied') {
+                    console.error("Tindakan: Sila pastikan Firestore Rules anda membenarkan akses kepada path: " + colPath);
+                }
+            });
+        };
+
+        // EXPOSED FUNCTIONS
         window.calculateTotal = () => {
-            const base = parseInt(document.getElementById('package-select').value);
-            const pax = parseInt(document.getElementById('extra-pax').value) || 1;
+            const base = parseInt(document.getElementById('package-select').value) || 0;
+            const paxInput = document.getElementById('extra-pax');
+            const pax = parseInt(paxInput.value) || 1;
+            
             let extraCost = 0;
             if (pax > 6) extraCost = (pax - 6) * 5;
+            
             totalFullPrice = base + extraCost;
             payNow = paymentType === 'full' ? totalFullPrice : 39;
+            
             const balance = totalFullPrice - payNow;
             document.getElementById('display-total-pay').innerText = `RM ${payNow.toFixed(2)}`;
+            
             const balanceEl = document.getElementById('display-balance-text');
             if (balance > 0) {
                 balanceEl.innerText = `BAKI RM ${balance.toFixed(2)} PERLU DIBAYAR DI STUDIO`;
@@ -326,35 +353,30 @@
         window.setPaymentType = (type) => {
             paymentType = type;
             calculateTotal();
-            document.getElementById('type-full').className = type === 'full' ? 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 shadow-sm transition-all' : 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
-            document.getElementById('type-booking').className = type === 'booking' ? 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 shadow-sm transition-all' : 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
-        };
-
-        window.selectQR = (provider) => {
-            const mBtn = document.getElementById('btn-qr-maybank');
-            const tBtn = document.getElementById('btn-qr-tngo');
-            const qrImg = document.getElementById('qr-display-img');
-            if (provider === 'maybank') {
-                mBtn.classList.add('qr-selected', 'border-amber-800');
-                mBtn.querySelector('img').classList.remove('grayscale');
-                tBtn.classList.remove('qr-selected', 'border-amber-800');
-                tBtn.querySelector('img').classList.add('grayscale');
-                qrImg.src = qrLinks.maybank;
+            const fullBtn = document.getElementById('type-full');
+            const bookBtn = document.getElementById('type-booking');
+            
+            if (type === 'full') {
+                fullBtn.className = 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 shadow-sm transition-all';
+                bookBtn.className = 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
             } else {
-                tBtn.classList.add('qr-selected', 'border-amber-800');
-                tBtn.querySelector('img').classList.remove('grayscale');
-                mBtn.classList.remove('qr-selected', 'border-amber-800');
-                mBtn.querySelector('img').classList.add('grayscale');
-                qrImg.src = qrLinks.tngo;
+                bookBtn.className = 'p-3 text-sm font-bold border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 shadow-sm transition-all';
+                fullBtn.className = 'p-3 text-sm font-bold border-2 rounded-2xl border-slate-100 text-slate-400 transition-all';
             }
         };
 
         window.renderSlots = () => {
-            const date = document.getElementById('booking-date').value;
+            const dateInput = document.getElementById('booking-date');
+            if(!dateInput) return;
+            const date = dateInput.value;
             const container = document.getElementById('slots-container');
             if (!container) return;
+            
             container.innerHTML = '';
-            const booked = allBookings.filter(b => b.date === date && b.verified).map(b => b.slot);
+            
+            const booked = allBookings
+                .filter(b => b.date === date && b.verified)
+                .map(b => b.slot);
 
             for(let h=9; h<22; h++) {
                 if(h === 19 || h === 20) continue; 
@@ -362,37 +384,81 @@
                     const time24 = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                     const time12 = formatTime12h(time24);
                     const isBooked = booked.includes(time24);
+                    
                     const div = document.createElement('div');
                     div.className = `p-4 text-center border-2 rounded-2xl text-xs font-bold transition-all ${isBooked ? 'slot-booked' : 'slot-available bg-white border-slate-100'}`;
                     div.innerText = time12;
-                    if(!isBooked) div.onclick = () => {
-                        document.querySelectorAll('.slot-available').forEach(e => e.classList.remove('bg-amber-800', 'text-white'));
-                        div.classList.add('bg-amber-800', 'text-white');
-                        selectedSlot = time24;
-                        document.getElementById('display-slot').innerText = time12;
-                        document.getElementById('selected-info').classList.remove('hidden');
-                    };
+                    
+                    if(!isBooked) {
+                        div.onclick = () => {
+                            document.querySelectorAll('.slot-available').forEach(e => {
+                                e.classList.remove('bg-amber-800', 'text-white');
+                                e.classList.add('bg-white', 'text-slate-900');
+                            });
+                            div.classList.remove('bg-white', 'text-slate-900');
+                            div.classList.add('bg-amber-800', 'text-white');
+                            selectedSlot = time24;
+                            document.getElementById('display-slot').innerText = time12;
+                            document.getElementById('selected-info').classList.remove('hidden');
+                        };
+                    }
                     container.appendChild(div);
                 });
+            }
+            
+            if (container.children.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-slate-400 py-10">Sila pilih tarikh untuk melihat slot.</p>`;
             }
         };
 
         window.openPaymentModal = () => {
-            if(!document.getElementById('cust-name').value) return alert('Sila masukkan nama penuh!');
-            if(!selectedSlot) return alert('Sila pilih slot terlebih dahulu!');
+            const name = document.getElementById('cust-name').value;
+            if(!name) {
+                alert('Sila masukkan nama penuh anda.');
+                return;
+            }
+            if(!selectedSlot) {
+                alert('Sila pilih slot masa.');
+                return;
+            }
             document.getElementById('qr-pay-amount').innerText = `RM ${payNow.toFixed(2)}`;
             document.getElementById('payment-modal').classList.remove('hidden');
         };
 
         window.closePaymentModal = () => document.getElementById('payment-modal').classList.add('hidden');
 
+        window.selectQR = (provider) => {
+            const mBtn = document.getElementById('btn-qr-maybank');
+            const tBtn = document.getElementById('btn-qr-tngo');
+            const qrImg = document.getElementById('qr-display-img');
+            
+            if (provider === 'maybank') {
+                mBtn.classList.add('qr-selected', 'border-amber-800');
+                tBtn.classList.remove('qr-selected', 'border-amber-800');
+                qrImg.src = qrLinks.maybank;
+            } else {
+                tBtn.classList.add('qr-selected', 'border-amber-800');
+                mBtn.classList.remove('qr-selected', 'border-amber-800');
+                qrImg.src = qrLinks.tngo;
+            }
+        };
+
         window.confirmBooking = async () => {
-            if(!currentUser) return;
-            const file = document.getElementById('receipt-upload').files[0];
-            if(!file) return alert('Sila muat naik resit bayaran!');
+            if(!currentUser) {
+                alert("Sistem belum sedia. Sila muat semula halaman.");
+                return;
+            }
+            const fileInput = document.getElementById('receipt-upload');
+            const file = fileInput.files[0];
+            if(!file) {
+                alert('Wajib muat naik resit bayaran sebagai bukti.');
+                return;
+            }
+
             const btn = document.getElementById('btn-submit');
-            btn.innerText = "Sila tunggu...";
+            btn.innerText = "Menghantar...";
             btn.disabled = true;
+
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const bookingData = {
@@ -405,17 +471,27 @@
                     totalPrice: totalFullPrice,
                     verified: false,
                     receipt: e.target.result, 
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    userId: currentUser.uid
                 };
+                
                 try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), bookingData);
-                    alert('Tempahan berjaya dihantar! Kami akan sahkan slot anda dalam masa terdekat.');
+                    console.log("Saving booking to Firestore...");
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
+                    await addDoc(colRef, bookingData);
+                    console.log("Booking saved successfully.");
+                    alert('Tempahan dihantar! Owner akan sahkan slot anda sebentar lagi.');
                     location.reload();
                 } catch (err) {
-                    alert('Gagal menghantar tempahan.');
+                    console.error("SAVE ERROR:", err.message);
+                    alert('Gagal menyimpan tempahan: ' + err.message);
                     btn.disabled = false;
                     btn.innerText = "Selesaikan Tempahan";
                 }
+            };
+            reader.onerror = () => {
+                alert("Gagal membaca fail resit.");
+                btn.disabled = false;
             };
             reader.readAsDataURL(file);
         };
@@ -425,72 +501,93 @@
             document.getElementById('admin-view').classList.toggle('hidden', view !== 'admin');
         };
 
-        window.checkAdminPassword = () => document.getElementById('admin-login-modal').classList.remove('hidden');
+        window.checkAdminPassword = () => {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        };
+        
         window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.add('hidden');
+        
         window.validateAdmin = () => {
-            if(document.getElementById('admin-pass').value === 'iqmal271') {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === 'iqmal271') {
                 closeAdminLogin();
                 switchTab('admin');
-            } else alert('Kata laluan salah!');
+            } else {
+                alert('Kata laluan owner salah!');
+            }
         };
 
         window.renderAdminList = () => {
-            const filterDate = document.getElementById('admin-date-filter').value;
+            const filterInput = document.getElementById('admin-date-filter');
+            if(!filterInput) return;
+            const filterDate = filterInput.value;
             const body = document.getElementById('admin-list-body');
             if (!body) return;
             body.innerHTML = '';
+            
             const filtered = allBookings.filter(b => b.date === filterDate);
-            let totalPaid = 0; let totalPending = 0; let totalBalanceToCollect = 0; let confirmedSlots = [];
-            filtered.forEach(b => {
+            let totalPaid = 0; let totalBalance = 0;
+            
+            filtered.sort((a,b) => a.slot.localeCompare(b.slot)).forEach(b => {
                 const balance = (b.totalPrice || b.amount) - b.amount;
                 if(b.verified) {
                     totalPaid += b.amount;
-                    totalBalanceToCollect += balance;
-                    confirmedSlots.push(b.slot);
-                } else {
-                    totalPending += b.amount;
+                    totalBalance += balance;
                 }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="px-8 py-6 font-black">${formatTime12h(b.slot)}</td>
-                    <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[10px] text-slate-400">Pax: ${b.pax} | ${b.phone}</span></td>
-                    <td class="px-8 py-6 text-center"><span class="px-3 py-1 rounded-full text-[10px] font-black ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${b.verified ? 'SAH' : 'PENDING'}</span></td>
-                    <td class="px-8 py-6 text-center font-bold">RM ${b.amount.toFixed(2)}</td>
-                    <td class="px-8 py-6 text-center font-black ${balance > 0 ? 'text-amber-700' : 'text-slate-300'}">${balance > 0 ? 'RM ' + balance.toFixed(2) : '-'}</td>
+                    <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[10px] text-slate-400">${b.phone}</span></td>
+                    <td class="px-8 py-6 text-center">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+                            ${b.verified ? 'SAH' : 'PENDING'}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6 text-center font-black">RM ${balance.toFixed(2)}</td>
                     <td class="px-8 py-6 text-right space-x-2">
-                        <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-xs uppercase hover:underline">Resit</button>
-                        ${!b.verified ? `<button onclick="approveBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[10px] font-bold uppercase">Sahkan</button>` : ''}
-                        <button onclick="deleteBooking('${b.id}')" class="text-red-500 font-bold text-xs uppercase hover:underline">Padam</button>
+                        <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-xs hover:underline">Resit</button>
+                        ${!b.verified ? `<button onclick="approveBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[10px] font-bold">Sahkan</button>` : ''}
+                        <button onclick="deleteBooking('${b.id}')" class="text-red-500 font-bold text-xs">Batal</button>
                     </td>
                 `;
                 body.appendChild(tr);
             });
+            
             document.getElementById('stat-total-bookings').innerText = filtered.length;
             document.getElementById('stat-paid-amount').innerText = `RM ${totalPaid.toFixed(2)}`;
-            document.getElementById('stat-pending-amount').innerText = `RM ${totalPending.toFixed(2)}`;
-            document.getElementById('stat-balance-collection').innerText = `RM ${totalBalanceToCollect.toFixed(2)}`;
-            const now = new Date();
-            const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            const nextSlot = confirmedSlots.filter(s => filterDate === now.toISOString().split('T')[0] ? s >= currentTimeStr : true).sort()[0] || '--:--';
-            document.getElementById('stat-next-slot').innerText = nextSlot !== '--:--' ? formatTime12h(nextSlot) : '--:--';
+            document.getElementById('stat-balance-collection').innerText = `RM ${totalBalance.toFixed(2)}`;
         };
 
         window.viewReceipt = (id) => {
             const b = allBookings.find(x => x.id === id);
+            if(!b || !b.receipt) return;
             const win = window.open();
             win.document.write(`<html><body style="margin:0;display:flex;justify-content:center;background:#000"><img src="${b.receipt}" style="max-height:100vh"></body></html>`);
         };
+        
         window.approveBooking = async (id) => {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-            await updateDoc(docRef, { verified: true });
-        };
-        window.deleteBooking = async (id) => {
-            if(confirm('Padam rekod ini?')) {
+            try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-                await deleteDoc(docRef);
+                await updateDoc(docRef, { verified: true });
+            } catch (err) {
+                console.error("Approve Error:", err.message);
             }
         };
-        initApp();
+        
+        window.deleteBooking = async (id) => {
+            if(confirm('Batalkan tempahan ini?')) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
+                    await deleteDoc(docRef);
+                } catch (err) {
+                    console.error("Delete Error:", err.message);
+                }
+            }
+        };
+
+        // RUN
+        window.onload = initApp;
     </script>
 </body>
 </html>
