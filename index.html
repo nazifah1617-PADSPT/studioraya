@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Booking System</title>
+    <title>Studio Raya 2026 - Local Booking System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -20,6 +20,12 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-subtle { animation: pulse-subtle 2s infinite; }
     </style>
 </head>
 <body class="bg-[#fafaf9] min-h-screen text-slate-900 overflow-x-hidden">
@@ -40,7 +46,7 @@
                     <div class="w-12 h-12 bg-amber-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-lg shadow-amber-900/20 rotate-3 group-hover:rotate-0 transition-transform">S</div>
                     <div>
                         <span class="text-xl font-extrabold text-slate-800 tracking-tight block leading-none">Studio Raya <span class="text-amber-800">2026</span></span>
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Sungai Bakap, Pulau Pinang</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Local Storage Version</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -55,7 +61,7 @@
     <main id="client-view" class="max-w-6xl mx-auto px-4 py-12">
         <header class="max-w-3xl mx-auto text-center mb-16">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Abadikan Memori <br><span class="text-amber-800">Lebaran 2026</span></h1>
-            <p class="text-slate-500 text-lg leading-relaxed">Sistem tempahan slot Mini Studio Raya Sungai Bakap. Mudah, cepat, dan teratur.</p>
+            <p class="text-slate-500 text-lg leading-relaxed">Sistem tempahan slot Mini Studio Raya. (Data disimpan pada peranti ini sahaja)</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -159,9 +165,9 @@
     <main id="admin-view" class="max-w-7xl mx-auto px-4 py-12 hidden">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
             <div>
-                <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-black rounded-full uppercase tracking-wider mb-2 inline-block">Sistem Pengurusan</span>
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-black rounded-full uppercase tracking-wider mb-2 inline-block">Sistem Pengurusan Lokal</span>
                 <h1 class="text-4xl font-black text-slate-900">Dashboard Owner</h1>
-                <p class="text-slate-500 font-medium mt-1">Pantau prestasi tempahan dan pengesahan bayaran.</p>
+                <p class="text-slate-500 font-medium mt-1">Pantau prestasi tempahan pada peranti ini.</p>
             </div>
             <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-3">Tapis Tarikh</span>
@@ -278,25 +284,16 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        // Global Variables
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'studio-raya-2026';
-
+    <script>
+        // Storage Configuration
+        const STORAGE_KEY = 'studio_raya_2026_bookings';
+        
+        // Global State
         let bookings = [];
-        let user = null;
         let selectedSlot = null;
         let payType = 'full';
         let totalCalculated = 0;
         let payNow = 0;
-        let unsubscribe = null;
 
         const qrMap = {
             maybank: "https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg",
@@ -324,37 +321,28 @@
             return `${h}:${minutes} ${ampm}`;
         };
 
-        // Core Logic
-        const startApp = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                onAuthStateChanged(auth, (u) => {
-                    if (u) {
-                        user = u;
-                        initListeners();
-                    }
-                });
-
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('booking-date').value = today;
-                document.getElementById('admin-filter-date').value = today;
-                updateCalculations();
-            } catch (err) { console.error(err); }
+        // Local Storage Logic
+        const loadFromStorage = () => {
+            const data = localStorage.getItem(STORAGE_KEY);
+            bookings = data ? JSON.parse(data) : [];
         };
 
-        const initListeners = () => {
-            if (!user) return;
-            const ref = collection(db, 'artifacts', appId, 'public', 'data', 'bookings');
-            unsubscribe = onSnapshot(ref, (snap) => {
-                bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderTimeSlots();
-                renderAdminDashboard();
-            }, (err) => console.error("Firestore Error:", err));
+        const saveToStorage = () => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+            renderTimeSlots();
+            renderAdminDashboard();
+        };
+
+        // Core Logic
+        const startApp = () => {
+            loadFromStorage();
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-date').value = today;
+            document.getElementById('admin-filter-date').value = today;
+            
+            updateCalculations();
+            renderTimeSlots();
         };
 
         window.updateCalculations = () => {
@@ -395,6 +383,7 @@
         window.renderTimeSlots = () => {
             const grid = document.getElementById('slots-grid');
             const date = document.getElementById('booking-date').value;
+            if(!grid) return;
             grid.innerHTML = '';
             
             // Filter verified bookings for this date
@@ -402,7 +391,7 @@
             
             let count = 0;
             for(let h=9; h<22; h++) {
-                if(h === 19) continue; // Skip 7pm slot (break)
+                if(h === 19) continue; // Skip 7pm slot
                 
                 [0, 30].forEach(m => {
                     const time24 = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
@@ -458,8 +447,9 @@
 
         window.closePayment = () => document.getElementById('payment-modal').classList.add('hidden');
 
-        window.submitBooking = async () => {
-            const file = document.getElementById('receipt-input').files[0];
+        window.submitBooking = () => {
+            const fileInput = document.getElementById('receipt-input');
+            const file = fileInput.files[0];
             if(!file) return showToast('Sila muat naik resit bayaran', '⚠️');
             
             const btn = document.getElementById('btn-confirm');
@@ -467,8 +457,9 @@
             btn.innerText = "MENGHANTAR...";
 
             const reader = new FileReader();
-            reader.onload = async (e) => {
-                const data = {
+            reader.onload = (e) => {
+                const newBooking = {
+                    id: Date.now().toString(),
                     name: document.getElementById('cust-name').value,
                     phone: document.getElementById('cust-phone').value,
                     date: document.getElementById('booking-date').value,
@@ -477,19 +468,15 @@
                     amount: payNow,
                     totalPrice: totalCalculated,
                     verified: false,
-                    receipt: e.target.result, // Base64
+                    receipt: e.target.result,
                     createdAt: new Date().toISOString()
                 };
 
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), data);
-                    showToast('Tempahan berjaya! Sila tunggu pengesahan.');
-                    setTimeout(() => location.reload(), 2000);
-                } catch (err) {
-                    showToast('Ralat menghantar tempahan', '❌');
-                    btn.disabled = false;
-                    btn.innerText = "SELESAIKAN TEMPAHAN";
-                }
+                bookings.push(newBooking);
+                saveToStorage();
+                
+                showToast('Tempahan berjaya disimpan secara lokal!');
+                setTimeout(() => location.reload(), 1500);
             };
             reader.readAsDataURL(file);
         };
@@ -509,6 +496,7 @@
                 nAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg shadow-slate-900/10';
                 nClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
             }
+            if(v === 'admin') renderAdminDashboard();
         };
 
         window.handleAdminAccess = () => {
@@ -525,7 +513,6 @@
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin();
                 switchView('admin');
-                renderAdminDashboard();
             } else {
                 showToast('Kata laluan salah', '❌');
             }
@@ -542,7 +529,6 @@
             
             let totalOnline = 0;
             let totalBalance = 0;
-            let confirmedCount = 0;
             let nextSlotTime = '--:--';
             
             const now = new Date();
@@ -553,7 +539,6 @@
                 if(b.verified) {
                     totalOnline += b.amount;
                     totalBalance += balance;
-                    confirmedCount++;
                     if(nextSlotTime === '--:--' && b.slot >= timeNowStr) nextSlotTime = b.slot;
                 }
 
@@ -596,21 +581,25 @@
             w.document.write(`<html><body style="margin:0;background:#0f172a;display:flex;align-items:center;justify-content:center;"><img src="${b.receipt}" style="max-height:90vh;border-radius:12px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5)"></body></html>`);
         };
 
-        window.confirmBooking = async (id) => {
-            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-            await updateDoc(ref, { verified: true });
-            showToast('Tempahan disahkan');
+        window.confirmBooking = (id) => {
+            const index = bookings.findIndex(b => b.id === id);
+            if(index !== -1) {
+                bookings[index].verified = true;
+                saveToStorage();
+                showToast('Tempahan disahkan');
+            }
         };
 
-        window.removeBooking = async (id) => {
+        window.removeBooking = (id) => {
             if(confirm('Padam tempahan ini?')) {
-                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-                await deleteDoc(ref);
+                bookings = bookings.filter(b => b.id !== id);
+                saveToStorage();
                 showToast('Rekod dipadam', '🗑️');
             }
         };
 
-        startApp();
+        // Initialize on Load
+        window.onload = startApp;
     </script>
 </body>
 </html>
