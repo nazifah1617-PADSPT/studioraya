@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Raya 2026 - Tempahan & Resit WhatsApp</title>
+    <title>Studio Raya 2026 - Tempahan Langsung</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -52,7 +52,7 @@
     <main id="client-view" class="max-w-6xl mx-auto px-4 py-12">
         <header class="max-w-3xl mx-auto text-center mb-16">
             <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Pakej Mini Studio Raya <br><span class="text-amber-800">Sungai Bakap 2026</span></h1>
-            <p class="text-slate-500 text-lg leading-relaxed">Silih pilih pakej dan slot masa anda di bawah. Maklumat disimpan secara real-time.</p>
+            <p class="text-slate-500 text-lg leading-relaxed">Silih pilih pakej dan slot masa anda di bawah. Tempahan disahkan secara automatik selepas bayaran.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -70,13 +70,13 @@
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
                     <h2 class="text-xl font-black mb-8 text-slate-800">Maklumat Tempahan</h2>
                     <div class="space-y-5">
-                        <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all" placeholder="Nama Penuh">
-                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all" placeholder="No. WhatsApp (Cth: 0123456789)">
+                        <input type="text" id="cust-name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all font-medium" placeholder="Nama Penuh">
+                        <input type="tel" id="cust-phone" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all font-medium" placeholder="No. WhatsApp (Cth: 0123456789)">
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pakej</label>
-                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold">
+                                <select id="package-select" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none">
                                     <option value="89">Sebelum Puasa (RM89)</option>
                                     <option value="99">Bulan Puasa (RM99)</option>
                                     <option value="150">Raya Pertama (RM150)</option>
@@ -84,12 +84,12 @@
                             </div>
                             <div>
                                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jumlah Pax</label>
-                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold">
+                                <input type="number" id="extra-pax" min="1" max="10" value="1" onchange="updateCalculations()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-bold outline-none">
                             </div>
                         </div>
 
                         <div class="pt-4">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block">Mod Bayaran</label>
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-1">Mod Bayaran</label>
                             <div class="grid grid-cols-2 gap-3">
                                 <button onclick="setPaymentType('full')" id="pay-type-full" class="p-4 text-[10px] font-black border-2 rounded-2xl border-amber-800 bg-amber-50 text-amber-900 transition-all">BAYARAN PENUH</button>
                                 <button onclick="setPaymentType('booking')" id="pay-type-booking" class="p-4 text-[10px] font-black border-2 rounded-2xl border-slate-100 text-slate-400 transition-all">BOOKING (RM39)</button>
@@ -103,7 +103,7 @@
                     <h3 id="ui-pay-now" class="text-5xl font-black tracking-tighter">RM 89.00</h3>
                     <div id="ui-balance-box" class="hidden mt-4 pt-4 border-t border-white/10">
                         <p class="text-[10px] text-amber-200/60 font-black uppercase">Baki di studio:</p>
-                        <p id="ui-balance-amount" class="text-xl font-bold text-amber-200">RM 0.00</p>
+                        <p id="ui-balance-amount" class="text-xl font-bold">RM 0.00</p>
                     </div>
                 </div>
             </div>
@@ -112,18 +112,18 @@
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 min-h-[600px] flex flex-col">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-xl font-black text-slate-800">Pilih Slot Masa</h2>
-                        <input type="date" id="booking-date" onchange="renderTimeSlots()" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black text-sm">
+                        <input type="date" id="booking-date" onchange="renderTimeSlots()" class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black text-sm outline-none focus:border-amber-500">
                     </div>
                     
                     <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
                     
                     <div id="selection-summary" class="hidden mt-auto pt-8">
-                        <div class="p-6 bg-amber-50 rounded-[2rem] border-2 border-amber-100 flex items-center justify-between">
+                        <div class="p-6 bg-amber-50 rounded-[2rem] border-2 border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div>
                                 <p class="text-[10px] text-amber-700 font-black uppercase">Masa Dipilih</p>
                                 <p class="text-3xl font-black text-amber-900" id="ui-selected-slot">--:--</p>
                             </div>
-                            <button onclick="openPaymentModal()" class="bg-amber-800 text-white px-8 py-5 rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all">BUAT BAYARAN</button>
+                            <button onclick="openPaymentModal()" class="w-full sm:w-auto bg-amber-800 text-white px-8 py-5 rounded-2xl font-black shadow-xl hover:bg-amber-900 transition-all active:scale-95">TERUSKAN BAYARAN</button>
                         </div>
                     </div>
                 </div>
@@ -136,7 +136,7 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
             <div>
                 <h1 class="text-4xl font-black text-slate-900">Dashboard Pemilik</h1>
-                <p class="text-slate-500">Urusan kewangan dan kutipan tunai di studio.</p>
+                <p class="text-slate-500">Semua tempahan disahkan secara automatik oleh sistem.</p>
             </div>
             <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-3">Tapis Tarikh</span>
@@ -150,8 +150,8 @@
                 <h3 id="stat-total" class="text-2xl font-black">0</h3>
             </div>
             <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Deposit (Online)</p>
-                <h3 id="stat-online" class="text-2xl font-black text-blue-600">RM 0.00</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Kutipan Online</p>
+                <h3 id="stat-online" class="text-2xl font-black text-green-600">RM 0.00</h3>
             </div>
             <div class="bg-amber-50 p-6 rounded-[2rem] border border-amber-100 shadow-sm">
                 <p class="text-[10px] font-black text-amber-600 uppercase mb-2">Baki Belum Dikutip</p>
@@ -166,17 +166,17 @@
         <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b font-medium">
                         <tr>
                             <th class="px-8 py-6">Masa</th>
                             <th class="px-8 py-6">Pelanggan</th>
                             <th class="px-8 py-6 text-center">Status</th>
                             <th class="px-8 py-6 text-center">Dibayar Online</th>
                             <th class="px-8 py-6 text-center text-amber-700">Baki Di Studio</th>
-                            <th class="px-8 py-6 text-right">Tindakan & Kutipan</th>
+                            <th class="px-8 py-6 text-right">Kutipan Baki?</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-table-body" class="divide-y divide-slate-50"></tbody>
+                    <tbody id="admin-table-body" class="divide-y divide-slate-50 font-medium"></tbody>
                 </table>
             </div>
         </div>
@@ -212,7 +212,7 @@
 
                 <div class="bg-white p-6 rounded-[2rem] border-2 border-slate-100 flex flex-col items-center shadow-inner">
                     <img id="qr-image" src="https://i.postimg.cc/Lh7CqX4L/maybank-qr.jpg" class="w-56 h-56 object-contain mb-4" alt="Scan QR">
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">Sila imbas kod di atas & muat naik resit di bawah</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center">Imbas kod di atas & muat naik resit bayaran</p>
                 </div>
             </div>
 
@@ -221,7 +221,7 @@
                 <input type="file" id="receipt-input" accept="image/*" class="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200 cursor-pointer bg-slate-50 p-2 rounded-2xl">
             </div>
 
-            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-xl hover:bg-amber-900 transition-all">SAHKAN & HANTAR TEMPAHAN</button>
+            <button onclick="submitBooking()" id="btn-submit" class="w-full py-5 bg-amber-800 text-white rounded-[1.5rem] font-black shadow-xl hover:bg-amber-900 transition-all active:scale-95">HANTAR TEMPAHAN</button>
         </div>
     </div>
 
@@ -233,8 +233,8 @@
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h2 class="text-2xl font-black text-slate-900">Tempahan Berjaya!</h2>
-                <p class="text-slate-500 text-sm">Hantar rujukan tempahan anda ke WhatsApp untuk rekod.</p>
+                <h2 class="text-2xl font-black text-slate-900">Tempahan Selesai!</h2>
+                <p class="text-slate-500 text-sm">Sila klik butang di bawah untuk menghantar butiran ke studio.</p>
             </div>
 
             <!-- Preview Slip -->
@@ -273,7 +273,7 @@
 
                 <div class="bg-slate-50 rounded-2xl p-6 space-y-3">
                     <div class="flex justify-between text-xs font-bold">
-                        <span class="text-slate-400 uppercase tracking-widest">Amaun Dibayar</span>
+                        <span class="text-slate-400 uppercase tracking-widest">Amaun Deposit</span>
                         <span id="rcpt-amount" class="text-slate-900 font-black">RM 0.00</span>
                     </div>
                     <div class="flex justify-between text-xs border-t border-slate-200 pt-3">
@@ -284,17 +284,12 @@
             </div>
 
             <div class="flex flex-col gap-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button onclick="sendToWhatsApp('customer')" class="bg-[#25D366] text-white py-4 rounded-2xl font-black shadow-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.903-6.16 2.544-1.64 1.641-2.543 3.841-2.543 6.162 0 1.611.433 3.191 1.245 4.578L3.394 24l4.695-1.231c1.332.727 2.83 1.111 4.35 1.111h.001c4.809 0 8.711-3.903 8.711-8.711 0-2.321-.904-4.521-2.545-6.162-1.641-1.641-3.841-2.544-6.162-2.544zM7.191 10.119c.148-.329.493-.541.83-.541.148 0 .294.032.423.088.13.056.242.144.331.258.113.144.186.314.214.492.027.177.011.359-.047.527l-.464 1.026c.307.399.664.756 1.063 1.063l1.026-.464c.168-.058.35-.074.527-.047.178.028.348.101.492.214.114.089.202.201.258.331.056.129.088.275.088.423 0 .337-.212.682-.541.83l-1.026.464c-.399-.307-.756-.664-1.063-1.063l.464-1.026c.058-.168.074-.35.047-.527a.64.64 0 00-.214-.492.65.65 0 00-.331-.258z"/></svg>
-                        HANTAR KE WHATSAPP SAYA
-                    </button>
-                    <button onclick="sendToWhatsApp('owner')" class="bg-slate-900 text-white py-4 rounded-2xl font-black shadow-xl flex items-center justify-center gap-2 hover:bg-black transition-all">
-                        HANTAR KE PEMILIK
-                    </button>
-                </div>
-                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all">
-                    SELESAI & TUTUP
+                <button onclick="sendToWhatsApp()" class="bg-[#25D366] text-white py-5 rounded-2xl font-black shadow-xl flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95 text-sm">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.903-6.16 2.544-1.64 1.641-2.543 3.841-2.543 6.162 0 1.611.433 3.191 1.245 4.578L3.394 24l4.695-1.231c1.332.727 2.83 1.111 4.35 1.111h.001c4.809 0 8.711-3.903 8.711-8.711 0-2.321-.904-4.521-2.545-6.162-1.641-1.641-3.841-2.544-6.162-2.544zM7.191 10.119c.148-.329.493-.541.83-.541.148 0 .294.032.423.088.13.056.242.144.331.258.113.144.186.314.214.492.027.177.011.359-.047.527l-.464 1.026c.307.399.664.756 1.063 1.063l1.026-.464c.168-.058.35-.074.527-.047.178.028.348.101.492.214.114.089.202.201.258.331.056.129.088.275.088.423 0 .337-.212.682-.541.83l-1.026.464c-.399-.307-.756-.664-1.063-1.063l.464-1.026c.058-.168.074-.35.047-.527a.64.64 0 00-.214-.492.65.65 0 00-.331-.258z"/></svg>
+                    HANTAR TEMPAHAN KE WHATSAPP STUDIO
+                </button>
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl font-black hover:bg-slate-200 transition-all text-sm uppercase tracking-widest">
+                    TEMPAH LAGI / TUTUP
                 </button>
             </div>
         </div>
@@ -336,7 +331,7 @@
         let payType = 'full';
         let totalCalculated = 0;
         let payNow = 0;
-        let currentBookingData = null; // Store for WhatsApp
+        let currentBookingData = null;
 
         window.showToast = (msg, icon = '✅') => {
             const toast = document.getElementById('toast');
@@ -425,6 +420,7 @@
             const date = document.getElementById('booking-date').value;
             if(!grid) return;
             grid.innerHTML = '';
+            // Filter all verified bookings (now auto-verified)
             const booked = bookings.filter(b => b.date === date && b.verified).map(b => b.slot);
             
             for(let h=9; h<22; h++) {
@@ -485,19 +481,19 @@
                     packageName: packageName,
                     amount: payNow, 
                     totalPrice: totalCalculated,
-                    verified: false, 
+                    verified: true, // AUTO-VERIFIED
                     balancePaid: false, 
                     receipt: e.target.result,
                     createdAt: new Date().toISOString()
                 };
                 try {
                     const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), bookingData);
-                    showToast('Tempahan berjaya dihantar!');
+                    showToast('Tempahan berjaya disimpan!');
                     currentBookingData = { ...bookingData, id: docRef.id };
                     showSuccessReceipt(currentBookingData);
                 } catch (err) {
                     showToast('Gagal menghantar tempahan', '❌');
-                    btn.disabled = false; btn.innerText = "SAHKAN & HANTAR TEMPAHAN";
+                    btn.disabled = false; btn.innerText = "HANTAR TEMPAHAN";
                 }
             };
             reader.readAsDataURL(file);
@@ -516,24 +512,16 @@
             document.getElementById('success-modal').classList.remove('hidden');
         };
 
-        window.sendToWhatsApp = (type) => {
+        window.sendToWhatsApp = () => {
             if(!currentBookingData) return;
-            
             const b = currentBookingData;
             const ref = b.id.substring(0, 5).toUpperCase();
             const dateStr = new Date(b.date).toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             const balance = (b.totalPrice - b.amount).toFixed(2);
             
-            const message = `🌟 *TEMPAHAN STUDIO RAYA 2026* 🌟%0A%0ANo Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Nota:* Sila tunggu pengesahan resit daripada admin. Terima kasih!`;
+            const message = `🌟 *TEMPAHAN STUDIO RAYA 2026* 🌟%0A%0ANo Rujukan: *#RAYA-${ref}*%0ANama: *${b.name}*%0APakej: *${b.packageName} (${b.pax} Pax)*%0ATarikh: *${dateStr}*%0AMasa: *${format12h(b.slot)}*%0A%0A----------------------------%0ADeposit Dibayar: *RM ${b.amount.toFixed(2)}*%0ABaki Di Studio: *RM ${balance}*%0A----------------------------%0A%0A*Status:* Tempahan dihantar. Sila semak resit di WhatsApp ini. Terima kasih!`;
 
-            let phone = (type === 'owner') ? '601151929350' : b.phone;
-            
-            // Clean phone number (remove non-digits)
-            phone = phone.replace(/\D/g, '');
-            if(phone.startsWith('0')) phone = '6' + phone;
-            if(!phone.startsWith('60')) phone = '60' + phone;
-
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            window.open(`https://wa.me/601151929350?text=${message}`, '_blank');
         };
 
         window.renderAdminDashboard = () => {
@@ -554,11 +542,10 @@
                 const balanceAtStudio = totalPrice - amountPaid;
                 const isBalancePaid = b.balancePaid || false;
                 
-                if(b.verified) { 
-                    onlineTotal += amountPaid; 
-                    if(isBalancePaid) balanceCollectedTotal += balanceAtStudio;
-                    else balancePendingTotal += balanceAtStudio;
-                }
+                // Track finances (all are verified auto)
+                onlineTotal += amountPaid; 
+                if(isBalancePaid) balanceCollectedTotal += balanceAtStudio;
+                else balancePendingTotal += balanceAtStudio;
                 
                 const tr = document.createElement('tr');
                 tr.className = isBalancePaid ? 'bg-emerald-50/50 transition-colors' : 'transition-colors';
@@ -566,11 +553,11 @@
                     <td class="px-8 py-6 font-black">${format12h(b.slot)}</td>
                     <td class="px-8 py-6"><b>${b.name}</b><br><span class="text-[9px] text-slate-400 uppercase font-bold">${b.phone}</span></td>
                     <td class="px-8 py-6 text-center">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${b.verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700 animate-pulse'}">
-                            ${b.verified ? 'Sah' : 'Pending'}
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-green-100 text-green-700">
+                            Tempahan Sah
                         </span>
                     </td>
-                    <td class="px-8 py-6 text-center font-bold text-slate-700">RM ${amountPaid.toFixed(2)}</td>
+                    <td class="px-8 py-6 text-center font-bold">RM ${amountPaid.toFixed(2)}</td>
                     <td class="px-8 py-6 text-center font-black ${balanceAtStudio > 0 ? (isBalancePaid ? 'text-emerald-600' : 'text-amber-800') : 'text-slate-300'}">
                         ${balanceAtStudio > 0 ? 'RM ' + balanceAtStudio.toFixed(2) : '-'}
                     </td>
@@ -580,12 +567,10 @@
                                 <span class="text-[9px] font-black text-slate-400 uppercase group-hover:text-emerald-600 transition-colors">Terima Baki?</span>
                                 <input type="checkbox" ${isBalancePaid ? 'checked' : ''} 
                                        onchange="updateBalancePaidStatus('${b.id}', this.checked)"
-                                       class="w-5 h-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                                       ${!b.verified ? 'disabled' : ''}>
+                                       class="w-5 h-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
                             </label>
                             <div class="h-6 w-px bg-slate-200 mx-2"></div>
                             <button onclick="viewReceipt('${b.id}')" class="text-indigo-600 font-bold text-[10px] uppercase hover:underline">Resit</button>
-                            ${!b.verified ? `<button onclick="confirmBooking('${b.id}')" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase hover:bg-black">Sahkan</button>` : ''}
                             <button onclick="removeBooking('${b.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
@@ -603,20 +588,12 @@
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                 await updateDoc(docRef, { balancePaid: status });
-                showToast(status ? 'Baki setel!' : 'Baki belum setel');
-            } catch (err) { console.error(err); }
-        };
-
-        window.confirmBooking = async (id) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
-                await updateDoc(docRef, { verified: true });
-                showToast('Tempahan disahkan');
+                showToast(status ? 'Kutipan tunai direkodkan!' : 'Kutipan tunai dibatalkan');
             } catch (err) { console.error(err); }
         };
 
         window.removeBooking = async (id) => {
-            if (window.confirm('Hapus tempahan ini?')) {
+            if (window.confirm('Hapus rekod tempahan ini?')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id);
                     await deleteDoc(docRef);
@@ -628,15 +605,29 @@
         window.openPaymentModal = () => {
             if(!document.getElementById('cust-name').value || !document.getElementById('cust-phone').value) 
                 return showToast('Sila lengkapkan maklumat!', '⚠️');
+            if(!selectedSlot) return showToast('Sila pilih slot masa!', '⚠️');
             document.getElementById('ui-modal-pay').innerText = `RM ${payNow.toFixed(2)}`;
             document.getElementById('payment-modal').classList.remove('hidden');
         };
         window.closePaymentModal = () => document.getElementById('payment-modal')?.classList.add('hidden');
+        
         window.switchView = (v) => {
             document.getElementById('client-view')?.classList.toggle('hidden', v !== 'client');
             document.getElementById('admin-view')?.classList.toggle('hidden', v !== 'admin');
-            if(v === 'admin') renderAdminDashboard();
+            
+            const btnClient = document.getElementById('nav-client');
+            const btnAdmin = document.getElementById('nav-admin');
+            
+            if (v === 'admin') {
+                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white shadow-lg';
+                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+                renderAdminDashboard();
+            } else {
+                btnClient.className = 'px-5 py-2.5 rounded-xl text-sm font-bold bg-amber-800 text-white shadow-lg';
+                btnAdmin.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all';
+            }
         };
+        
         window.handleAdminAccess = () => {
             if (!document.getElementById('admin-view').classList.contains('hidden')) {
                 switchView('client');
@@ -648,11 +639,11 @@
         window.verifyAdmin = () => {
             if(document.getElementById('admin-password').value === 'iqmal271') {
                 closeAdminLogin(); switchView('admin');
-            } else showToast('Salah!', '❌');
+            } else showToast('Kata laluan salah!', '❌');
         };
         window.viewReceipt = (id) => {
             const b = bookings.find(x => x.id === id);
-            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%">`); }
+            if(b && b.receipt) { const w = window.open(); w.document.write(`<img src="${b.receipt}" style="max-width:100%; border-radius: 12px;">`); }
             else showToast('Tiada resit', 'ℹ️');
         };
 
