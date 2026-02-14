@@ -1,0 +1,7 @@
+{
+  "name": "Studio Raya 2026 - Booking System",
+  "description": "Sistem tempahan rasmi Studio Raya 2026 dengan integrasi Firebase dan WhatsApp.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
